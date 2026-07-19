@@ -1,12 +1,12 @@
 # Group_2_WDD430_Handcrafted-Haven
 
-# Handcrafted Haven 🎨✨
+# Handcrafted Haven
 
 **Handcrafted Haven** is a collaborative web application designed to connect local artisans with customers who appreciate unique, high-quality, handmade products. Developed as part of the WDD 430 course at BYU-Idaho, this platform offers role-based access for both Sellers (Artisans) and Customers to streamline listing, browsing, and buying hand-made goods.
 
 ---
 
-## 👥 Group Collaborators
+## Group Collaborators
 *   **Israel Ayomikun Asimi** (W03 Group Leader)
 *   **Emmanuel Kingsley Okafor**
 *   **Andrew Chigozie Awadike**
@@ -15,7 +15,7 @@
 
 ---
 
-## 📅 W02 Meeting Summary
+## W02 Meeting Summary
 
 *   **Date:** July 9, 2026
 *   **Opening Prayer:** Emmanuel Kingsley Okafor
@@ -30,20 +30,20 @@
 
 ---
 
-## 🎨 Design System
+## Design System
 
 We chose a premium, rustic, and elegant color scheme paired with highly readable typography to evoke an artisan, high-end feel.
 
 ### Color Palette
 
-| Element | Color Name | Hex Code | Preview |
-| :--- | :--- | :--- | :---: |
-| **Primary** | Rich Charcoal | `#14110F` | `⬛ #14110F` |
-| **Secondary** | Warm Ivory | `#F6F2EC` | `⬜ #F6F2EC` |
-| **Accent** | Antique Gold | `#B88A4A` | `🟨 #B88A4A` |
-| **Primary Text** | Espresso | `#2C241F` | `🟫 #2C241F` |
-| **Secondary Text** | Stone Gray | `#766B63` | `🩶 #766B63` |
-| **Borders** | Soft Beige | `#DDD3C6` | `🏻 #DDD3C6` |
+| Element | Color Name | Hex Code |
+| :--- | :--- | :--- |
+| **Primary** | Rich Charcoal | `#14110F` |
+| **Secondary** | Warm Ivory | `#F6F2EC` |
+| **Accent** | Antique Gold | `#B88A4A` |
+| **Primary Text** | Espresso | `#2C241F` |
+| **Secondary Text** | Stone Gray | `#766B63` |
+| **Borders** | Soft Beige | `#DDD3C6` |
 
 ### Typography
 *   **Headings:** `Cormorant Garamond` (gives a premium, elegant, and classic artisan feel).
@@ -51,7 +51,7 @@ We chose a premium, rustic, and elegant color scheme paired with highly readable
 
 ---
 
-## 📋 Initial Backlog & User Stories
+## Initial Backlog & User Stories
 
 Below are the 10 core user stories brainstormed and mapped out for our initial kanban planning.
 
