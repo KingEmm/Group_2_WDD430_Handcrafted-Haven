@@ -14,7 +14,7 @@ export default function Newsletter() {
 
   return (
     <section className="bg-ivory">
-      <Container className="pb-20">
+      <Container className="py-20">
         <div className="mx-auto max-w-2xl border border-beige bg-white/40 px-6 py-12 text-center">
           <MailIcon className="mx-auto h-7 w-7 text-gold" />
           <h2 className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-espresso">
