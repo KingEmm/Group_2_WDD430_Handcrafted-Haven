@@ -1,17 +1,24 @@
 import Container from "@/components/ui/Container";
+import Hero from "@/components/about/AboutHero";
+import Values from "@/components/about/Values";
+import Story from "@/components/about/story";
+import Impact from "@/components/about/impact";
+import MadeWithHeart from "@/components/about/MadeWithHeart";
+import CTA from "@/components/about/CTA";
 
 export default function AboutPage() {
   return (
-    <Container className="py-24 text-center">
-      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">
-        About
-      </p>
-      <h1 className="mt-4 font-[family-name:var(--font-heading)] text-5xl">
-        Our Story
-      </h1>
-      <p className="mx-auto mt-4 max-w-md text-stone">
-        This page is coming soon.
-      </p>
+    <Container className="py-6 text-center">
+      <Hero />
+      <Values />
+      <Story />
+      <Impact />
+      <MadeWithHeart />
+      <CTA />
     </Container>
   );
 }
+
+//     </Container>
+//   );
+// }
