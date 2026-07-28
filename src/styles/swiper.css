@@ -1,0 +1,26 @@
+.swiper {
+  padding-bottom: 60px;
+}
+
+.swiper-slide {
+  height: auto;
+}
+
+.swiper-slide > * {
+  height: 100%;
+}
+
+.swiper-pagination {
+  bottom: 0 !important;
+}
+
+.swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background: #d8cfc4;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: #b88a4a;
+}
