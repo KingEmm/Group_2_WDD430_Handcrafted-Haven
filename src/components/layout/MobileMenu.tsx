@@ -11,6 +11,7 @@ import {
   UserIcon,
   CartIcon,
 } from "@/components/ui/icons";
+import CartBadge from "./CartBadge";
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false);
@@ -82,8 +83,14 @@ export default function MobileMenu() {
           <Link href="/account" onClick={() => setOpen(false)} aria-label="Account">
             <UserIcon className="h-6 w-6" />
           </Link>
-          <Link href="/cart" onClick={() => setOpen(false)} aria-label="Cart">
+          <Link
+            href="/cart"
+            onClick={() => setOpen(false)}
+            aria-label="Cart"
+            className="relative"
+          >
             <CartIcon className="h-6 w-6" />
+            <CartBadge />
           </Link>
         </div>
       </aside>

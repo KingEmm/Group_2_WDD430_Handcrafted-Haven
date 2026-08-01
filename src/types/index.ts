@@ -29,3 +29,8 @@ export interface Product {
   description: string;
   featured?: boolean;
 }
+
+export interface CartItem {
+  slug: string;
+  quantity: number;
+}

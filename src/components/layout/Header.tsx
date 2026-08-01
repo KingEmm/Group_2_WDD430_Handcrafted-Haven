@@ -3,6 +3,7 @@ import Logo from "./Logo";
 import Navbar from "./Navbar";
 import MobileMenu from "./MobileMenu";
 import AccountMenu from "./AccountMenu";
+import CartBadge from "./CartBadge";
 import Container from "@/components/ui/Container";
 import { SearchIcon, CartIcon } from "@/components/ui/icons";
 import { getSession } from "@/lib/session";
@@ -31,9 +32,7 @@ export default async function Header() {
             className="relative hidden transition-colors hover:text-gold sm:block"
           >
             <CartIcon className="h-5 w-5" />
-            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] font-semibold text-ivory">
-              0
-            </span>
+            <CartBadge />
           </Link>
           <MobileMenu />
         </div>
