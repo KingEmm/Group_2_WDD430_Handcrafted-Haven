@@ -1,9 +1,24 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "@/types";
 import { formatPrice } from "@/lib/utils";
+import { useCart } from "@/context/CartContext";
 
 export default function ProductCard({ product }: { product: Product }) {
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
+
+  function handleAddToCart(event: React.MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    addItem(product.slug);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1500);
+  }
+
   return (
     <Link
       href={`/collection/${product.slug}`}
@@ -17,6 +32,13 @@ export default function ProductCard({ product }: { product: Product }) {
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          className="absolute inset-x-3 bottom-3 bg-charcoal/90 py-2.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-ivory opacity-0 transition-opacity duration-200 hover:bg-charcoal group-hover:opacity-100 focus-visible:opacity-100"
+        >
+          {added ? "Added" : "Add to Cart"}
+        </button>
       </div>
 
       <div className="pt-4">
