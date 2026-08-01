@@ -1,0 +1,23 @@
+# Local development database only. The deployed app uses a hosted Postgres
+# instance, configured via DATABASE_URL in the hosting platform's
+# environment variables — this file is never used in production.
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: handcrafted_haven
+      POSTGRES_USER: haven
+      POSTGRES_PASSWORD: haven_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U haven -d handcrafted_haven"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
