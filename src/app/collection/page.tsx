@@ -1,7 +1,7 @@
 import Container from "@/components/ui/Container";
 import CategoryFilter from "@/components/product/CategoryFilter";
 import ProductGrid from "@/components/product/ProductGrid";
-import { PRODUCTS } from "@/data/products";
+import { getAllProducts } from "@/lib/products";
 import { CATEGORIES } from "@/data/categories";
 import type { CategorySlug } from "@/types";
 
@@ -21,9 +21,10 @@ export default async function CollectionPage({
   const { category } = await searchParams;
   const active = parseCategory(category);
 
+  const allProducts = await getAllProducts();
   const products = active
-    ? PRODUCTS.filter((p) => p.category === active)
-    : PRODUCTS;
+    ? allProducts.filter((p) => p.category === active)
+    : allProducts;
 
   const activeName = active
     ? CATEGORIES.find((c) => c.slug === active)?.name

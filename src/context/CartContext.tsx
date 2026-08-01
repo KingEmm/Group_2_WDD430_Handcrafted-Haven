@@ -7,8 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CartItem } from "@/types";
-import { PRODUCTS } from "@/data/products";
+import type { CartItem, Product } from "@/types";
 
 const STORAGE_KEY = "haven_cart";
 
@@ -16,6 +15,7 @@ type CartContextValue = {
   items: CartItem[];
   itemCount: number;
   subtotal: number;
+  products: Product[];
   addItem: (slug: string, quantity?: number) => void;
   removeItem: (slug: string) => void;
   setQuantity: (slug: string, quantity: number) => void;
@@ -42,6 +42,7 @@ function readStoredCart(): CartItem[] {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     // Hydrate from localStorage after mount only, so the client's first
@@ -49,6 +50,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setItems(readStoredCart());
     setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => setProducts(data.products ?? []))
+      .catch(() => setProducts([]));
   }, []);
 
   useEffect(() => {
@@ -90,7 +98,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce((sum, item) => {
-    const product = PRODUCTS.find((p) => p.slug === item.slug);
+    const product = products.find((p) => p.slug === item.slug);
     return product ? sum + product.price * item.quantity : sum;
   }, 0);
 
@@ -100,6 +108,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         items,
         itemCount,
         subtotal,
+        products,
         addItem,
         removeItem,
         setQuantity,
