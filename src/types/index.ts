@@ -28,6 +28,10 @@ export interface Product {
   image: string;
   description: string;
   featured?: boolean;
+  // Seller-submitted products come from the DB with an arbitrary image host,
+  // so they can't go through next/image's remotePatterns allowlist like the
+  // static catalog images can — components use this to pick <img> vs Image.
+  source?: "static" | "db";
 }
 
 export interface CartItem {

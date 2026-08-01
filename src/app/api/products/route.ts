@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import sql from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { slugify } from "@/lib/utils";
+import { getAllProducts } from "@/lib/products";
+import { PRODUCTS } from "@/data/products";
 
 const ALLOWED_CATEGORIES = ["furniture", "ceramics", "textiles", "accessories"];
+
+export async function GET() {
+  const products = await getAllProducts();
+  return NextResponse.json({ products });
+}
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
@@ -53,10 +60,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const staticSlugs = new Set(PRODUCTS.map((p) => p.slug));
+
     let slug = baseSlug;
     let suffix = 2;
     while (true) {
-      const existing = await sql`SELECT id FROM products WHERE slug = ${slug}`;
+      const existing = staticSlugs.has(slug)
+        ? [{ id: "static" }]
+        : await sql`SELECT id FROM products WHERE slug = ${slug}`;
       if (existing.length === 0) break;
       slug = `${baseSlug}-${suffix}`;
       suffix += 1;

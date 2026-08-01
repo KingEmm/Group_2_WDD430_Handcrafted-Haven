@@ -7,6 +7,7 @@ import ProductDetailActions from "@/components/product/ProductDetailActions";
 import { PRODUCTS } from "@/data/products";
 import { CATEGORIES } from "@/data/categories";
 import { formatPrice } from "@/lib/utils";
+import { getAllProducts, getProductBySlug } from "@/lib/products";
 
 export function generateStaticParams() {
   return PRODUCTS.map((product) => ({ slug: product.slug }));
@@ -18,16 +19,17 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = PRODUCTS.find((p) => p.slug === slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     notFound();
   }
 
   const category = CATEGORIES.find((c) => c.slug === product.category);
-  const relatedProducts = PRODUCTS.filter(
-    (p) => p.category === product.category && p.slug !== product.slug,
-  ).slice(0, 4);
+  const allProducts = await getAllProducts();
+  const relatedProducts = allProducts
+    .filter((p) => p.category === product.category && p.slug !== product.slug)
+    .slice(0, 4);
 
   return (
     <Container className="py-16 lg:py-24">
@@ -49,14 +51,23 @@ export default async function ProductPage({
 
       <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
         <div className="relative aspect-[4/5] w-full overflow-hidden bg-beige/40">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover"
-            priority
-          />
+          {product.source === "db" ? (
+            // eslint-disable-next-line @next/next/no-img-element -- seller-submitted image host isn't in next/image's remotePatterns allowlist
+            <img
+              src={product.image}
+              alt={product.name}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+              priority
+            />
+          )}
         </div>
 
         <div>
