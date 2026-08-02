@@ -2,6 +2,13 @@ import sql from "@/lib/db";
 import { PRODUCTS } from "@/data/products";
 import type { Product } from "@/types";
 
+export const ALLOWED_CATEGORIES = [
+  "furniture",
+  "ceramics",
+  "textiles",
+  "accessories",
+];
+
 type ProductRow = {
   slug: string;
   name: string;

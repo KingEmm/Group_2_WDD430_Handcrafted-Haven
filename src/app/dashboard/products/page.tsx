@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import DeleteProductButton from "@/components/dashboard/DeleteProductButton";
@@ -59,6 +60,12 @@ export default async function DashboardProductsPage() {
                 <p className="whitespace-nowrap text-sm font-medium text-espresso">
                   {formatPrice(product.price)}
                 </p>
+                <Link
+                  href={`/dashboard/products/${product.id}/edit`}
+                  className="text-xs uppercase tracking-[0.15em] text-stone underline-offset-4 transition-colors hover:text-espresso hover:underline"
+                >
+                  Edit
+                </Link>
                 <DeleteProductButton id={product.id} name={product.name} />
               </div>
             </li>
