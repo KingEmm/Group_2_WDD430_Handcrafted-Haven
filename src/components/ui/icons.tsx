@@ -61,6 +61,12 @@ export const ArrowRightIcon = (p: IconProps) => (
   </Base>
 );
 
+export const StarIcon = ({ filled = false, ...p }: IconProps & { filled?: boolean }) => (
+  <Base fill={filled ? "currentColor" : "none"} {...p}>
+    <path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.9L12 16.4l-5.2 2.8 1-5.9-4.3-4.1 5.9-.9L12 3Z" />
+  </Base>
+);
+
 export const MailIcon = (p: IconProps) => (
   <Base {...p}>
     <rect x="3" y="5" width="18" height="14" rx="2" />
