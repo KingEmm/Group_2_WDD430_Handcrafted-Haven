@@ -19,16 +19,17 @@ type ProductRow = {
   description: string;
   featured: boolean;
   artisan: string;
+  seller_id: string;
 };
 
-function dbRowToProduct(row: ProductRow): Product {
-  return { ...row, source: "db" };
+function dbRowToProduct({ seller_id, ...row }: ProductRow): Product {
+  return { ...row, source: "db", sellerId: seller_id };
 }
 
 export async function getAllProducts(): Promise<Product[]> {
   const rows = await sql<ProductRow[]>`
     SELECT p.slug, p.name, p.category, p.price, p.origin, p.image,
-           p.description, p.featured, u.name AS artisan
+           p.description, p.featured, p.seller_id, u.name AS artisan
     FROM products p
     JOIN users u ON u.id = p.seller_id
     ORDER BY p.created_at DESC
@@ -45,7 +46,7 @@ export async function getProductBySlug(
 
   const rows = await sql<ProductRow[]>`
     SELECT p.slug, p.name, p.category, p.price, p.origin, p.image,
-           p.description, p.featured, u.name AS artisan
+           p.description, p.featured, p.seller_id, u.name AS artisan
     FROM products p
     JOIN users u ON u.id = p.seller_id
     WHERE p.slug = ${slug}
