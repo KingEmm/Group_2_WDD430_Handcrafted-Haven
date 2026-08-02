@@ -45,7 +45,7 @@ export default function CraftHero() {
           <div className="mt-12 flex flex-col gap-4 sm:flex-row">
 
             <Link
-              href="/shop"
+              href="/collection"
               className="group inline-flex items-center justify-center gap-3 rounded-lg bg-[#B88A4A] px-8 py-4 text-base font-medium text-white transition-all duration-300 hover:scale-105 hover:bg-[#A6783F]"
             >
               Explore Products

@@ -40,7 +40,7 @@ export default function CTA() {
             <div className="mt-12 flex flex-col items-center justify-center gap-5 sm:flex-row">
 
               <Link
-                href="/shop"
+                href="/collection"
                 className="group inline-flex items-center gap-3 rounded-lg bg-[#B88A4A] px-8 py-4 text-lg font-medium text-white transition-all duration-300 hover:scale-105 hover:bg-[#A6783F]"
               >
                 Explore Collection
