@@ -1,5 +1,6 @@
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
+import DeleteProductButton from "@/components/dashboard/DeleteProductButton";
 import sql from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { formatPrice } from "@/lib/utils";
@@ -54,9 +55,12 @@ export default async function DashboardProductsPage() {
                   {product.category}
                 </p>
               </div>
-              <p className="whitespace-nowrap text-sm font-medium text-espresso">
-                {formatPrice(product.price)}
-              </p>
+              <div className="flex items-center gap-6">
+                <p className="whitespace-nowrap text-sm font-medium text-espresso">
+                  {formatPrice(product.price)}
+                </p>
+                <DeleteProductButton id={product.id} name={product.name} />
+              </div>
             </li>
           ))}
         </ul>
