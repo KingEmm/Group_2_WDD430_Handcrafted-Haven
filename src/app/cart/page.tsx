@@ -135,16 +135,12 @@ export default function CartPage() {
             </div>
             <div className="flex justify-between text-stone">
               <dt>Shipping</dt>
-              <dd>Calculated at checkout</dd>
+              <dd>Free</dd>
             </div>
           </dl>
-          <button
-            type="button"
-            disabled
-            className="mt-6 w-full cursor-not-allowed bg-gold/50 px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.15em] text-ivory"
-          >
-            Checkout (coming soon)
-          </button>
+          <Button href="/checkout" className="mt-6 w-full justify-center">
+            Checkout
+          </Button>
         </aside>
       </div>
     </Container>

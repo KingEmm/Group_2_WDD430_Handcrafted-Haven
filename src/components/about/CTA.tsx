@@ -52,7 +52,7 @@ export default function CTA() {
               </Link>
 
               <Link
-                href="/seller/register"
+                href="/register?role=seller"
                 className="rounded-lg border border-[#B88A4A] px-8 py-4 text-lg font-medium text-white transition-all duration-300 hover:bg-[#B88A4A]"
               >
                 Become a Seller

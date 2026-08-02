@@ -79,7 +79,18 @@ export default async function ProductPage({
             {product.name}
           </h1>
           <p className="mt-3 text-sm text-stone">
-            by {product.artisan} · {product.origin}
+            by{" "}
+            {product.sellerId ? (
+              <Link
+                href={`/artisans/${product.sellerId}`}
+                className="text-espresso hover:text-gold hover:underline"
+              >
+                {product.artisan}
+              </Link>
+            ) : (
+              product.artisan
+            )}{" "}
+            · {product.origin}
           </p>
           <p className="mt-6 text-2xl font-medium tracking-wide text-espresso">
             {formatPrice(product.price)}
