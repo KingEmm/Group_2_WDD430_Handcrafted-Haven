@@ -20,6 +20,7 @@ echo "Applying schema..."
 docker compose exec -T db psql -U "$DB_USER" -d "$DB_NAME" -v ON_ERROR_STOP=1 -f - < sql/01_schema.sql
 docker compose exec -T db psql -U "$DB_USER" -d "$DB_NAME" -v ON_ERROR_STOP=1 -f - < sql/03_products.sql
 docker compose exec -T db psql -U "$DB_USER" -d "$DB_NAME" -v ON_ERROR_STOP=1 -f - < sql/04_password_resets.sql
+docker compose exec -T db psql -U "$DB_USER" -d "$DB_NAME" -v ON_ERROR_STOP=1 -f - < sql/05_orders.sql
 
 echo "Seeding test accounts..."
 docker compose exec -T db psql -U "$DB_USER" -d "$DB_NAME" -v ON_ERROR_STOP=1 -f - < sql/02_seed.sql
