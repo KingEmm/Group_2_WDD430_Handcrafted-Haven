@@ -55,6 +55,9 @@ export default async function DashboardPage() {
         <Button href="/dashboard/products" variant="outline">
           Manage Products
         </Button>
+        <Button href="/dashboard/orders" variant="outline">
+          View Sales
+        </Button>
       </div>
     </Container>
   );

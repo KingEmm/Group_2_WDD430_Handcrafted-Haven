@@ -95,6 +95,80 @@ export async function createOrder(
   return orderId;
 }
 
+export type OrderListItem = {
+  id: string;
+  orderNumber: number;
+  subtotal: number;
+  createdAt: Date;
+  itemCount: number;
+};
+
+export async function getOrdersByCustomerId(
+  customerId: string,
+): Promise<OrderListItem[]> {
+  const rows = await sql`
+    SELECT o.id, o.order_number, o.subtotal, o.created_at,
+           COALESCE(SUM(oi.quantity), 0) AS item_count
+    FROM orders o
+    LEFT JOIN order_items oi ON oi.order_id = o.id
+    WHERE o.customer_id = ${customerId}
+    GROUP BY o.id, o.order_number, o.subtotal, o.created_at
+    ORDER BY o.created_at DESC
+  `;
+
+  return rows.map((row) => ({
+    id: row.id,
+    orderNumber: row.order_number,
+    subtotal: row.subtotal,
+    createdAt: row.created_at,
+    itemCount: Number(row.item_count),
+  }));
+}
+
+export type SellerSaleItem = {
+  orderId: string;
+  orderNumber: number;
+  createdAt: Date;
+  customerName: string;
+  shippingCity: string;
+  shippingState: string;
+  productSlug: string;
+  productName: string;
+  unitPrice: number;
+  quantity: number;
+};
+
+export async function getSellerSales(
+  sellerId: string,
+): Promise<SellerSaleItem[]> {
+  // order_items snapshots product_slug rather than an FK, since static
+  // catalog purchases have no products row at all — joining on slug only
+  // picks up sales of this seller's own DB-backed products.
+  const rows = await sql`
+    SELECT o.id AS order_id, o.order_number, o.created_at, o.customer_name,
+           o.shipping_city, o.shipping_state,
+           oi.product_slug, oi.product_name, oi.unit_price, oi.quantity
+    FROM order_items oi
+    JOIN products p ON p.slug = oi.product_slug
+    JOIN orders o ON o.id = oi.order_id
+    WHERE p.seller_id = ${sellerId}
+    ORDER BY o.created_at DESC
+  `;
+
+  return rows.map((row) => ({
+    orderId: row.order_id,
+    orderNumber: row.order_number,
+    createdAt: row.created_at,
+    customerName: row.customer_name,
+    shippingCity: row.shipping_city,
+    shippingState: row.shipping_state,
+    productSlug: row.product_slug,
+    productName: row.product_name,
+    unitPrice: row.unit_price,
+    quantity: row.quantity,
+  }));
+}
+
 export async function getOrderById(id: string): Promise<OrderSummary | null> {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
     return null;

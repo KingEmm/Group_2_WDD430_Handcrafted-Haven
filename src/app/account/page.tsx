@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Container from "@/components/ui/Container";
+import Button from "@/components/ui/Button";
 import { getSession } from "@/lib/session";
 
 export default async function AccountPage() {
@@ -27,6 +28,9 @@ export default async function AccountPage() {
         </p>
         <p className="mt-1 text-sm capitalize">{session.role}</p>
       </div>
+      <Button href="/account/orders" variant="outline" className="mt-8">
+        View Order History
+      </Button>
     </Container>
   );
 }

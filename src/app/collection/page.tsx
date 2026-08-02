@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Container from "@/components/ui/Container";
 import CategoryFilter from "@/components/product/CategoryFilter";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -6,6 +7,7 @@ import { CATEGORIES } from "@/data/categories";
 import type { CategorySlug } from "@/types";
 
 const VALID_CATEGORIES = new Set(CATEGORIES.map((c) => c.slug));
+const PAGE_SIZE = 12;
 
 function parseCategory(value?: string): CategorySlug | null {
   return value && VALID_CATEGORIES.has(value as CategorySlug)
@@ -16,15 +18,33 @@ function parseCategory(value?: string): CategorySlug | null {
 export default async function CollectionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; page?: string }>;
 }) {
-  const { category } = await searchParams;
+  const { category, page } = await searchParams;
   const active = parseCategory(category);
 
   const allProducts = await getAllProducts();
   const products = active
     ? allProducts.filter((p) => p.category === active)
     : allProducts;
+
+  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+  const currentPage = Math.min(
+    Math.max(1, Number(page) || 1),
+    totalPages,
+  );
+  const pagedProducts = products.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
+  function pageHref(targetPage: number): string {
+    const params = new URLSearchParams();
+    if (active) params.set("category", active);
+    if (targetPage > 1) params.set("page", String(targetPage));
+    const query = params.toString();
+    return query ? `/collection?${query}` : "/collection";
+  }
 
   const activeName = active
     ? CATEGORIES.find((c) => c.slug === active)?.name
@@ -53,8 +73,45 @@ export default async function CollectionPage({
       </div>
 
       <div className="mt-12">
-        <ProductGrid products={products} />
+        <ProductGrid products={pagedProducts} />
       </div>
+
+      {totalPages > 1 && (
+        <nav
+          aria-label="Pagination"
+          className="mt-12 flex items-center justify-center gap-6"
+        >
+          {currentPage > 1 ? (
+            <Link
+              href={pageHref(currentPage - 1)}
+              className="text-xs uppercase tracking-[0.15em] text-stone hover:text-espresso"
+            >
+              Previous
+            </Link>
+          ) : (
+            <span className="text-xs uppercase tracking-[0.15em] text-stone/40">
+              Previous
+            </span>
+          )}
+
+          <p className="text-xs uppercase tracking-[0.15em] text-stone">
+            Page {currentPage} of {totalPages}
+          </p>
+
+          {currentPage < totalPages ? (
+            <Link
+              href={pageHref(currentPage + 1)}
+              className="text-xs uppercase tracking-[0.15em] text-stone hover:text-espresso"
+            >
+              Next
+            </Link>
+          ) : (
+            <span className="text-xs uppercase tracking-[0.15em] text-stone/40">
+              Next
+            </span>
+          )}
+        </nav>
+      )}
     </Container>
   );
 }

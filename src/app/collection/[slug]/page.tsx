@@ -1,13 +1,18 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { Star } from "lucide-react";
 import Container from "@/components/ui/Container";
 import ProductGrid from "@/components/product/ProductGrid";
 import ProductDetailActions from "@/components/product/ProductDetailActions";
+import ReviewList from "@/components/product/ReviewList";
+import ReviewForm from "@/components/forms/ReviewForm";
 import { PRODUCTS } from "@/data/products";
 import { CATEGORIES } from "@/data/categories";
 import { formatPrice } from "@/lib/utils";
 import { getAllProducts, getProductBySlug } from "@/lib/products";
+import { getSession } from "@/lib/session";
+import { getReviewsForProduct, hasPurchasedProduct } from "@/lib/reviews";
 
 export function generateStaticParams() {
   return PRODUCTS.map((product) => ({ slug: product.slug }));
@@ -30,6 +35,18 @@ export default async function ProductPage({
   const relatedProducts = allProducts
     .filter((p) => p.category === product.category && p.slug !== product.slug)
     .slice(0, 4);
+
+  const session = await getSession();
+  const reviews = await getReviewsForProduct(product.slug);
+  const hasReviewed = session
+    ? reviews.some((review) => review.customerId === session.userId)
+    : false;
+  const hasPurchased = session
+    ? await hasPurchasedProduct(session.userId, product.slug)
+    : false;
+  const averageRating = reviews.length
+    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+    : 0;
 
   return (
     <Container className="py-16 lg:py-24">
@@ -103,12 +120,41 @@ export default async function ProductPage({
       </div>
 
       <section className="mt-20 border-t border-beige pt-12">
-        <h2 className="font-[family-name:var(--font-heading)] text-2xl">
-          Reviews
-        </h2>
-        <p className="mt-3 text-sm text-stone">
-          No reviews yet — be the first to share your thoughts.
-        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="font-[family-name:var(--font-heading)] text-2xl">
+            Reviews
+          </h2>
+          {reviews.length > 0 && (
+            <div className="flex items-center gap-1.5 text-sm text-stone">
+              <Star size={14} className="fill-gold text-gold" />
+              <span>
+                {averageRating.toFixed(1)} out of 5 · {reviews.length}{" "}
+                {reviews.length === 1 ? "review" : "reviews"}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <ReviewList reviews={reviews} />
+
+        {!session ? (
+          <p className="mt-8 border-t border-beige pt-8 text-sm text-stone">
+            <Link href="/login" className="font-semibold text-gold hover:text-gold-dark">
+              Sign in
+            </Link>{" "}
+            to write a review.
+          </p>
+        ) : !hasPurchased ? (
+          <p className="mt-8 border-t border-beige pt-8 text-sm text-stone">
+            Purchase this product to leave a review.
+          </p>
+        ) : hasReviewed ? (
+          <p className="mt-8 border-t border-beige pt-8 text-sm text-stone">
+            You&apos;ve already reviewed this product.
+          </p>
+        ) : (
+          <ReviewForm productSlug={product.slug} />
+        )}
       </section>
 
       {relatedProducts.length > 0 && (
