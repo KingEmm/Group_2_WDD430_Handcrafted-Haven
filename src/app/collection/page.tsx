@@ -1,13 +1,15 @@
+import Link from "next/link";
 import Container from "@/components/ui/Container";
 import CategoryFilter from "@/components/product/CategoryFilter";
 import PriceFilter from "@/components/product/PriceFilter";
 import ProductGrid from "@/components/product/ProductGrid";
 import { getAllProducts } from "@/lib/products";
 import { CATEGORIES } from "@/data/categories";
-import { parsePriceBand, matchesPriceBand } from "@/lib/filters";
+import { collectionHref, matchesPriceBand, parsePriceBand } from "@/lib/filters";
 import type { CategorySlug } from "@/types";
 
 const VALID_CATEGORIES = new Set(CATEGORIES.map((c) => c.slug));
+const PAGE_SIZE = 12;
 
 function parseCategory(value?: string): CategorySlug | null {
   return value && VALID_CATEGORIES.has(value as CategorySlug)
@@ -18,9 +20,9 @@ function parseCategory(value?: string): CategorySlug | null {
 export default async function CollectionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; price?: string }>;
+  searchParams: Promise<{ category?: string; price?: string; page?: string }>;
 }) {
-  const { category, price } = await searchParams;
+  const { category, price, page } = await searchParams;
   const active = parseCategory(category);
   const priceBand = parsePriceBand(price);
 
@@ -30,6 +32,24 @@ export default async function CollectionPage({
     if (priceBand && !matchesPriceBand(product.price, priceBand)) return false;
     return true;
   });
+
+  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+  const currentPage = Math.min(
+    Math.max(1, Number(page) || 1),
+    totalPages,
+  );
+  const pagedProducts = products.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
+  function pageHref(targetPage: number): string {
+    return collectionHref({
+      category: active,
+      price: priceBand?.slug ?? null,
+      page: targetPage,
+    });
+  }
 
   const activeName = active
     ? CATEGORIES.find((c) => c.slug === active)?.name
@@ -61,8 +81,45 @@ export default async function CollectionPage({
       </div>
 
       <div className="mt-12">
-        <ProductGrid products={products} />
+        <ProductGrid products={pagedProducts} />
       </div>
+
+      {totalPages > 1 && (
+        <nav
+          aria-label="Pagination"
+          className="mt-12 flex items-center justify-center gap-6"
+        >
+          {currentPage > 1 ? (
+            <Link
+              href={pageHref(currentPage - 1)}
+              className="text-xs uppercase tracking-[0.15em] text-stone hover:text-espresso"
+            >
+              Previous
+            </Link>
+          ) : (
+            <span className="text-xs uppercase tracking-[0.15em] text-stone/40">
+              Previous
+            </span>
+          )}
+
+          <p className="text-xs uppercase tracking-[0.15em] text-stone">
+            Page {currentPage} of {totalPages}
+          </p>
+
+          {currentPage < totalPages ? (
+            <Link
+              href={pageHref(currentPage + 1)}
+              className="text-xs uppercase tracking-[0.15em] text-stone hover:text-espresso"
+            >
+              Next
+            </Link>
+          ) : (
+            <span className="text-xs uppercase tracking-[0.15em] text-stone/40">
+              Next
+            </span>
+          )}
+        </nav>
+      )}
     </Container>
   );
 }

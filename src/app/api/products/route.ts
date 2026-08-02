@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import sql from "@/lib/db";
 import { getSession } from "@/lib/session";
-import { slugify } from "@/lib/utils";
+import { isValidImageUrl, slugify } from "@/lib/utils";
 import { ALLOWED_CATEGORIES, getAllProducts } from "@/lib/products";
 import { PRODUCTS } from "@/data/products";
 
@@ -40,6 +40,13 @@ export async function POST(request: NextRequest) {
 
     if (!ALLOWED_CATEGORIES.includes(category)) {
       return NextResponse.json({ error: "Invalid category." }, { status: 400 });
+    }
+
+    if (!isValidImageUrl(image)) {
+      return NextResponse.json(
+        { error: "Enter a valid image URL." },
+        { status: 400 },
+      );
     }
 
     const priceValue = Number(price);

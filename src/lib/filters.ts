@@ -36,15 +36,17 @@ export function searchProducts(products: Product[], query: string): Product[] {
   );
 }
 
-// Builds a /collection URL that keeps whichever filters are set, so category
-// and price selections compose instead of clobbering each other.
+// Builds a /collection URL that keeps whichever filters are set, so category,
+// price, and page selections compose instead of clobbering each other.
 export function collectionHref(params: {
   category?: string | null;
   price?: string | null;
+  page?: number | null;
 }): string {
   const searchParams = new URLSearchParams();
   if (params.category) searchParams.set("category", params.category);
   if (params.price) searchParams.set("price", params.price);
+  if (params.page && params.page > 1) searchParams.set("page", String(params.page));
   const query = searchParams.toString();
   return query ? `/collection?${query}` : "/collection";
 }

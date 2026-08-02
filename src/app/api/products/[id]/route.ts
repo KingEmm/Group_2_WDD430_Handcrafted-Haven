@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import sql from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { ALLOWED_CATEGORIES } from "@/lib/products";
+import { isValidImageUrl } from "@/lib/utils";
 
 export async function GET(
   request: NextRequest,
@@ -86,6 +87,13 @@ export async function PATCH(
 
     if (!ALLOWED_CATEGORIES.includes(category)) {
       return NextResponse.json({ error: "Invalid category." }, { status: 400 });
+    }
+
+    if (!isValidImageUrl(image)) {
+      return NextResponse.json(
+        { error: "Enter a valid image URL." },
+        { status: 400 },
+      );
     }
 
     const priceValue = Number(price);

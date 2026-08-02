@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Input from "@/components/ui/Input";
 import { CATEGORIES } from "@/data/categories";
+import { isValidImageUrl } from "@/lib/utils";
 import type { CategorySlug } from "@/types";
 
 type FormErrors = {
@@ -65,6 +66,8 @@ export default function ProductForm({
 
     if (!image.trim()) {
       nextErrors.image = "Image URL is required.";
+    } else if (!isValidImageUrl(image.trim())) {
+      nextErrors.image = "Enter a valid image URL (starting with http:// or https://).";
     }
 
     if (!description.trim()) {
