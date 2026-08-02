@@ -13,13 +13,17 @@ type FormErrors = {
   form?: string;
 };
 
-export default function RegisterForm() {
+export default function RegisterForm({
+  initialRole = "customer",
+}: {
+  initialRole?: "customer" | "seller";
+}) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState<"customer" | "seller">("customer");
+  const [role, setRole] = useState<"customer" | "seller">(initialRole);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 

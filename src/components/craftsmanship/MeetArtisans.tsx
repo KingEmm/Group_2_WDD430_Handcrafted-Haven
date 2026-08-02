@@ -1,35 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import { getSellersWithProducts } from "@/lib/sellers";
 
-const artisans = [
-  {
-    name: "John D'Souza",
-    craft: "Master Potter",
-    experience: "25 Years Experience",
-    image: "/images/craftsmanship/philosophy.jpg",
-  },
-  {
-    name: "Mei Lin",
-    craft: "Textile Weaver",
-    experience: "18 Years Experience",
-    image: "/images/about/weaving.jpg",
-  },
-  {
-    name: "Arjun Singh",
-    craft: "Wood Carver",
-    experience: "20 Years Experience",
-    image: "/images/craftsmanship/artisans/woodcarver.jpg",
-  },
-  {
-    name: "Isabella Tan",
-    craft: "Jewelry Artisan",
-    experience: "12 Years Experience",
-    image: "/images/craftsmanship/artisans/jewelry.jpg",
-  },
-];
+const MEMBER_SINCE_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+});
 
-export default function MeetArtisans() {
+export default async function MeetArtisans() {
+  const sellers = await getSellersWithProducts();
+  const featured = sellers.slice(0, 4);
+
   return (
     <section className="bg-[#FCFAF7] py-24">
       <div className="mx-auto max-w-7xl px-6">
@@ -77,59 +59,62 @@ export default function MeetArtisans() {
 
           {/* Cards */}
 
-          <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+          {featured.length === 0 ? (
+            <div className="flex items-center justify-center rounded-2xl border border-dashed border-[#B88A4A]/30 bg-white p-12 text-center text-[#766B63]">
+              No artisans have listed anything yet — check back soon.
+            </div>
+          ) : (
+            <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
 
-            {artisans.map((artisan) => (
-              <article
-                key={artisan.name}
-                className="group overflow-hidden rounded-2xl bg-white shadow-sm transition duration-300 hover:-translate-y-2 hover:shadow-xl"
-              >
+              {featured.map((seller) => (
+                <article
+                  key={seller.id}
+                  className="group overflow-hidden rounded-2xl bg-white shadow-sm transition duration-300 hover:-translate-y-2 hover:shadow-xl"
+                >
 
-                <div className="relative h-72 overflow-hidden">
+                  <div className="relative h-72 overflow-hidden">
 
-                  <Image
-                    src={artisan.image}
-                    alt={artisan.name}
-                    fill
-                    className="object-cover transition duration-700 group-hover:scale-110"
-                  />
-
-                </div>
-
-                <div className="p-6">
-
-                  <h3 className="text-xl font-semibold text-[#2C241F]">
-                    {artisan.name}
-                  </h3>
-
-                  <p className="mt-2 text-[#B88A4A]">
-                    {artisan.craft}
-                  </p>
-
-                  <p className="mt-3 text-sm text-[#766B63]">
-                    {artisan.experience}
-                  </p>
-
-                  <Link
-                    href={`/artisans/${artisan.name
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`}
-                    className="group mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#2C241F]"
-                  >
-                    Read Story
-
-                    <ArrowRight
-                      size={16}
-                      className="transition group-hover:translate-x-1"
+                    <ImagePlaceholder
+                      label={seller.name}
+                      className="h-full w-full transition duration-700 group-hover:scale-110"
                     />
-                  </Link>
 
-                </div>
+                  </div>
 
-              </article>
-            ))}
+                  <div className="p-6">
 
-          </div>
+                    <h3 className="text-xl font-semibold text-[#2C241F]">
+                      {seller.name}
+                    </h3>
+
+                    <p className="mt-2 text-[#B88A4A]">
+                      {seller.productCount}{" "}
+                      {seller.productCount === 1 ? "piece" : "pieces"} listed
+                    </p>
+
+                    <p className="mt-3 text-sm text-[#766B63]">
+                      Member since {MEMBER_SINCE_FORMATTER.format(seller.memberSince)}
+                    </p>
+
+                    <Link
+                      href={`/artisans/${seller.id}`}
+                      className="group mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#2C241F]"
+                    >
+                      View Storefront
+
+                      <ArrowRight
+                        size={16}
+                        className="transition group-hover:translate-x-1"
+                      />
+                    </Link>
+
+                  </div>
+
+                </article>
+              ))}
+
+            </div>
+          )}
 
         </div>
 
