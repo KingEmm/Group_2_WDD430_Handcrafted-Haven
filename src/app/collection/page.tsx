@@ -1,8 +1,10 @@
 import Container from "@/components/ui/Container";
 import CategoryFilter from "@/components/product/CategoryFilter";
+import PriceFilter from "@/components/product/PriceFilter";
 import ProductGrid from "@/components/product/ProductGrid";
 import { getAllProducts } from "@/lib/products";
 import { CATEGORIES } from "@/data/categories";
+import { parsePriceBand, matchesPriceBand } from "@/lib/filters";
 import type { CategorySlug } from "@/types";
 
 const VALID_CATEGORIES = new Set(CATEGORIES.map((c) => c.slug));
@@ -16,15 +18,18 @@ function parseCategory(value?: string): CategorySlug | null {
 export default async function CollectionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; price?: string }>;
 }) {
-  const { category } = await searchParams;
+  const { category, price } = await searchParams;
   const active = parseCategory(category);
+  const priceBand = parsePriceBand(price);
 
   const allProducts = await getAllProducts();
-  const products = active
-    ? allProducts.filter((p) => p.category === active)
-    : allProducts;
+  const products = allProducts.filter((product) => {
+    if (active && product.category !== active) return false;
+    if (priceBand && !matchesPriceBand(product.price, priceBand)) return false;
+    return true;
+  });
 
   const activeName = active
     ? CATEGORIES.find((c) => c.slug === active)?.name
@@ -45,11 +50,14 @@ export default async function CollectionPage({
         </p>
       </header>
 
-      <div className="mt-12 flex flex-col gap-6 border-b border-beige pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <CategoryFilter active={active} />
-        <p className="text-xs uppercase tracking-[0.15em] text-stone">
-          {products.length} {products.length === 1 ? "piece" : "pieces"}
-        </p>
+      <div className="mt-12 flex flex-col gap-5 border-b border-beige pb-6">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <CategoryFilter active={active} price={priceBand?.slug ?? null} />
+          <p className="text-xs uppercase tracking-[0.15em] text-stone">
+            {products.length} {products.length === 1 ? "piece" : "pieces"}
+          </p>
+        </div>
+        <PriceFilter active={priceBand?.slug ?? null} category={active} />
       </div>
 
       <div className="mt-12">
