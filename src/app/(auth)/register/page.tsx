@@ -1,7 +1,14 @@
 import Container from "@/components/ui/Container";
 import RegisterForm from "@/components/forms/RegisterForm";
 
-export default function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ role?: string }>;
+}) {
+  const { role } = await searchParams;
+  const initialRole = role === "seller" ? "seller" : "customer";
+
   return (
     <Container className="py-24">
       <div className="text-center">
@@ -17,7 +24,7 @@ export default function RegisterPage() {
       </div>
 
       <div className="mt-12">
-        <RegisterForm />
+        <RegisterForm initialRole={initialRole} />
       </div>
     </Container>
   );
