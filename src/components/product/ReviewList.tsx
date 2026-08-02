@@ -1,4 +1,4 @@
-import type { Review } from "@/lib/reviews";
+import type { Review } from "@/types";
 import ReviewCard from "./ReviewCard";
 
 export default function ReviewList({ reviews }: { reviews: Review[] }) {
@@ -11,10 +11,10 @@ export default function ReviewList({ reviews }: { reviews: Review[] }) {
   }
 
   return (
-    <ul className="mt-6 divide-y divide-beige">
+    <div className="mt-2">
       {reviews.map((review) => (
         <ReviewCard key={review.id} review={review} />
       ))}
-    </ul>
+    </div>
   );
 }

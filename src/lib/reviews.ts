@@ -1,71 +1,40 @@
 import sql from "@/lib/db";
+import type { Review } from "@/types";
 
-export class ReviewError extends Error {}
-
-export type Review = {
+type ReviewRow = {
   id: string;
-  customerId: string;
-  customerName: string;
+  product_slug: string;
+  author: string;
   rating: number;
-  comment: string;
-  createdAt: Date;
+  body: string;
+  created_at: Date;
 };
 
+function rowToReview(row: ReviewRow): Review {
+  return {
+    id: row.id,
+    productSlug: row.product_slug,
+    author: row.author,
+    rating: row.rating,
+    body: row.body,
+    createdAt: row.created_at.toISOString(),
+  };
+}
+
 export async function getReviewsForProduct(slug: string): Promise<Review[]> {
-  const rows = await sql`
-    SELECT r.id, r.customer_id, u.name AS customer_name, r.rating, r.comment, r.created_at
+  const rows = await sql<ReviewRow[]>`
+    SELECT r.id, r.product_slug, r.rating, r.body, r.created_at, u.name AS author
     FROM reviews r
-    JOIN users u ON u.id = r.customer_id
+    JOIN users u ON u.id = r.user_id
     WHERE r.product_slug = ${slug}
     ORDER BY r.created_at DESC
   `;
 
-  return rows.map((row) => ({
-    id: row.id,
-    customerId: row.customer_id,
-    customerName: row.customer_name,
-    rating: row.rating,
-    comment: row.comment,
-    createdAt: row.created_at,
-  }));
+  return rows.map(rowToReview);
 }
 
-export async function hasPurchasedProduct(
-  customerId: string,
-  slug: string,
-): Promise<boolean> {
-  const [row] = await sql`
-    SELECT 1
-    FROM order_items oi
-    JOIN orders o ON o.id = oi.order_id
-    WHERE o.customer_id = ${customerId} AND oi.product_slug = ${slug}
-    LIMIT 1
-  `;
-
-  return Boolean(row);
-}
-
-export async function createReview(
-  customerId: string,
-  slug: string,
-  rating: number,
-  comment: string,
-): Promise<void> {
-  const purchased = await hasPurchasedProduct(customerId, slug);
-  if (!purchased) {
-    throw new ReviewError("You can only review products you've purchased.");
-  }
-
-  try {
-    await sql`
-      INSERT INTO reviews (product_slug, customer_id, rating, comment)
-      VALUES (${slug}, ${customerId}, ${rating}, ${comment})
-    `;
-  } catch (error) {
-    const code = (error as { code?: string })?.code;
-    if (code === "23505") {
-      throw new ReviewError("You've already reviewed this product.");
-    }
-    throw error;
-  }
+export function averageRating(reviews: Review[]): number {
+  if (reviews.length === 0) return 0;
+  const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+  return total / reviews.length;
 }

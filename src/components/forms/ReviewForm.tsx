@@ -2,35 +2,38 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Star } from "lucide-react";
+import { StarIcon } from "@/components/ui/icons";
 
 export default function ReviewForm({ productSlug }: { productSlug: string }) {
   const router = useRouter();
   const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [hover, setHover] = useState(0);
+  const [body, setBody] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError("");
 
     if (rating < 1) {
-      setError("Choose a rating.");
+      setError("Please select a star rating.");
       return;
     }
-    if (!comment.trim()) {
-      setError("Enter a comment.");
+
+    if (!body.trim()) {
+      setError("Please add a few words about your experience.");
       return;
     }
 
     setIsSubmitting(true);
-    setError(null);
 
     try {
       const response = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: productSlug, rating, comment }),
+        body: JSON.stringify({ slug: productSlug, rating, body }),
       });
 
       const data = await response.json();
@@ -41,74 +44,77 @@ export default function ReviewForm({ productSlug }: { productSlug: string }) {
         return;
       }
 
-      setComment("");
+      setBody("");
       setRating(0);
+      setHover(0);
+      setSuccess(true);
+      setIsSubmitting(false);
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
-    } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mt-8 flex flex-col gap-4 border-t border-beige pt-8"
-    >
-      <div>
-        <label className="text-xs font-semibold uppercase tracking-[0.15em] text-espresso">
-          Your Rating
-        </label>
-        <div className="mt-2 flex gap-1">
-          {Array.from({ length: 5 }).map((_, i) => {
-            const value = i + 1;
-            return (
-              <button
-                key={value}
-                type="button"
-                aria-label={`Rate ${value} out of 5`}
-                onClick={() => setRating(value)}
-              >
-                <Star
-                  size={22}
-                  className={
-                    value <= rating ? "fill-gold text-gold" : "text-beige"
-                  }
-                />
-              </button>
-            );
-          })}
-        </div>
+    <form onSubmit={handleSubmit} className="mt-8 max-w-xl" noValidate>
+      <p className="text-xs font-semibold uppercase tracking-[0.15em] text-espresso">
+        Your rating
+      </p>
+      <div className="mt-2 flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => {
+              setRating(star);
+              setSuccess(false);
+            }}
+            onMouseEnter={() => setHover(star)}
+            onMouseLeave={() => setHover(0)}
+            aria-label={`${star} star${star > 1 ? "s" : ""}`}
+            aria-pressed={rating === star}
+            className="rounded-sm p-0.5 text-gold transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          >
+            <StarIcon filled={star <= (hover || rating)} className="h-7 w-7" />
+          </button>
+        ))}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label
-          htmlFor="comment"
-          className="text-xs font-semibold uppercase tracking-[0.15em] text-espresso"
-        >
-          Your Review
-        </label>
-        <textarea
-          id="comment"
-          rows={4}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          className="w-full border border-beige bg-ivory px-4 py-3 text-sm text-espresso placeholder:text-stone/60 focus:border-gold focus:outline-none"
-          placeholder="Share your thoughts on this piece..."
-        />
-      </div>
+      <label
+        htmlFor="review-body"
+        className="mt-6 block text-xs font-semibold uppercase tracking-[0.15em] text-espresso"
+      >
+        Your review
+      </label>
+      <textarea
+        id="review-body"
+        rows={4}
+        value={body}
+        onChange={(e) => {
+          setBody(e.target.value);
+          setSuccess(false);
+        }}
+        placeholder="What did you think of this piece?"
+        className="mt-2 w-full border border-beige bg-ivory px-4 py-3 text-sm text-espresso placeholder:text-stone/60 focus:border-gold focus:outline-none"
+        aria-invalid={Boolean(error)}
+      />
 
       {error && (
-        <p className="text-sm text-red-500" role="alert">
+        <p className="mt-3 text-sm text-red-500" role="alert">
           {error}
+        </p>
+      )}
+      {success && (
+        <p className="mt-3 text-sm text-pine" role="status">
+          Thank you — your review has been posted.
         </p>
       )}
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="inline-flex w-fit items-center justify-center gap-2 bg-gold px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.15em] text-ivory transition-colors duration-200 hover:bg-gold-dark disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-4 inline-flex items-center justify-center gap-2 bg-gold px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.15em] text-ivory transition-colors duration-200 hover:bg-gold-dark disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Posting..." : "Post Review"}
       </button>

@@ -14,11 +14,9 @@ export default function CraftHero() {
         className="object-cover object-right"
       />
 
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#14110F]/95 via-[#14110F]/75 to-transparent" />
-
-      {/* Decorative Glow */}
-      <div className="absolute -left-40 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-[#B88A4A]/10 blur-3xl" />
+      {/* Dark Overlay — anchors text legibility on the left without washing
+          out the photo on the right. */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#14110F]/90 via-[#14110F]/60 to-transparent" />
 
       {/* Content */}
       <div className="relative z-10 mx-auto flex min-h-[92vh] max-w-7xl items-center px-6">
@@ -58,7 +56,7 @@ export default function CraftHero() {
 
             <Link
               href="/artisans"
-              className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/5 px-8 py-4 text-base font-medium text-white backdrop-blur-sm transition-all duration-300 hover:border-[#B88A4A] hover:bg-white/10"
+              className="inline-flex items-center justify-center rounded-lg border border-white/30 bg-white/10 px-8 py-4 text-base font-medium text-white transition-all duration-300 hover:border-[#B88A4A] hover:bg-white/20"
             >
               Meet the Artisans
             </Link>
@@ -103,8 +101,8 @@ export default function CraftHero() {
         </div>
       </div>
 
-      {/* Bottom Fade */}
-      <div className="absolute bottom-0 left-0 h-40 w-full bg-gradient-to-t from-[#FCFAF7] to-transparent" />
+      {/* Bottom Fade — subtle blend into the cream section below. */}
+      <div className="absolute bottom-0 left-0 h-20 w-full bg-gradient-to-t from-[#FCFAF7] to-transparent" />
     </section>
   );
 }

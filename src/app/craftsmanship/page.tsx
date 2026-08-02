@@ -1,4 +1,3 @@
-import Container from "@/components/ui/Container";
 import CraftHero from "@/components/craftsmanship/CraftHero";
 import Philosophy from "@/components/craftsmanship/Philosophy";
 import Process from "@/components/craftsmanship/Process";
@@ -12,7 +11,7 @@ import "@/styles/swiper.css";
 
 export default function CraftsmanshipPage() {
   return (
-    <Container className="py-0 text-center">
+    <>
       <CraftHero />
       <Philosophy />
       <Process />
@@ -21,6 +20,6 @@ export default function CraftsmanshipPage() {
       <Categories />
       <Testimonials />
       <CTA />
-    </Container>
+    </>
   );
 }

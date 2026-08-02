@@ -1,7 +1,7 @@
-import { Star } from "lucide-react";
-import type { Review } from "@/lib/reviews";
+import type { Review } from "@/types";
+import StarRating from "@/components/ui/StarRating";
 
-const REVIEW_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
   month: "long",
   day: "numeric",
@@ -9,22 +9,17 @@ const REVIEW_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
 
 export default function ReviewCard({ review }: { review: Review }) {
   return (
-    <li className="py-6">
-      <div className="flex items-center gap-1">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            size={14}
-            className={i < review.rating ? "fill-gold text-gold" : "text-beige"}
-          />
-        ))}
+    <article className="border-b border-beige py-6">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-espresso">{review.author}</p>
+          <p className="mt-1 text-xs uppercase tracking-[0.15em] text-stone">
+            {dateFormatter.format(new Date(review.createdAt))}
+          </p>
+        </div>
+        <StarRating rating={review.rating} />
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-espresso">
-        {review.comment}
-      </p>
-      <p className="mt-3 text-xs uppercase tracking-[0.15em] text-stone">
-        {review.customerName} · {REVIEW_DATE_FORMATTER.format(review.createdAt)}
-      </p>
-    </li>
+      <p className="mt-4 text-sm leading-relaxed text-stone">{review.body}</p>
+    </article>
   );
 }

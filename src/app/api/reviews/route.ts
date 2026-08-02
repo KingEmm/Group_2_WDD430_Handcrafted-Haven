@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import sql from "@/lib/db";
 import { getSession } from "@/lib/session";
-import { createReview, ReviewError } from "@/lib/reviews";
+import { getProductBySlug } from "@/lib/products";
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
@@ -13,35 +14,53 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { slug, rating, comment } = await request.json();
+    const { slug, rating, body } = await request.json();
 
     if (!slug || typeof slug !== "string") {
-      return NextResponse.json({ error: "Missing product." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing product." },
+        { status: 400 },
+      );
     }
 
     const ratingValue = Number(rating);
     if (!Number.isInteger(ratingValue) || ratingValue < 1 || ratingValue > 5) {
       return NextResponse.json(
-        { error: "Rating must be between 1 and 5." },
+        { error: "Rating must be a whole number from 1 to 5." },
         { status: 400 },
       );
     }
 
-    if (!comment || typeof comment !== "string" || !comment.trim()) {
+    const trimmedBody = typeof body === "string" ? body.trim() : "";
+    if (!trimmedBody) {
       return NextResponse.json(
-        { error: "Enter a comment for your review." },
+        { error: "Please add a few words about your experience." },
         { status: 400 },
       );
     }
 
-    await createReview(session.userId, slug, ratingValue, comment.trim());
-
-    return NextResponse.json({ message: "Review posted." }, { status: 201 });
-  } catch (error) {
-    if (error instanceof ReviewError) {
-      return NextResponse.json({ error: error.message }, { status: 403 });
+    const product = await getProductBySlug(slug);
+    if (!product) {
+      return NextResponse.json(
+        { error: "Product not found." },
+        { status: 404 },
+      );
     }
 
+    // One review per user per product — re-submitting updates the existing row.
+    const [review] = await sql`
+      INSERT INTO reviews (product_slug, user_id, rating, body)
+      VALUES (${slug}, ${session.userId}, ${ratingValue}, ${trimmedBody})
+      ON CONFLICT (product_slug, user_id)
+      DO UPDATE SET rating = EXCLUDED.rating, body = EXCLUDED.body, created_at = now()
+      RETURNING id
+    `;
+
+    return NextResponse.json(
+      { message: "Review posted.", id: review.id },
+      { status: 201 },
+    );
+  } catch (error) {
     console.error("Create review error:", error);
     return NextResponse.json(
       { error: "Something went wrong. Please try again." },
