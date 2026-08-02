@@ -54,9 +54,16 @@ export type SellerProfile = {
   products: Product[];
 };
 
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function getSellerProfile(
   id: string,
 ): Promise<SellerProfile | null> {
+  // Route params are arbitrary strings — querying a non-UUID id would
+  // otherwise throw a Postgres error instead of a clean 404.
+  if (!UUID_PATTERN.test(id)) return null;
+
   const [seller] = await sql<{ id: string; name: string; created_at: Date }[]>`
     SELECT id, name, created_at FROM users WHERE id = ${id} AND role = 'seller'
   `;
