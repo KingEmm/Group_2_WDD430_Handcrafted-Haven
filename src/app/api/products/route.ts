@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import sql from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { slugify } from "@/lib/utils";
-import { getAllProducts } from "@/lib/products";
+import { ALLOWED_CATEGORIES, getAllProducts } from "@/lib/products";
 import { PRODUCTS } from "@/data/products";
-
-const ALLOWED_CATEGORIES = ["furniture", "ceramics", "textiles", "accessories"];
 
 export async function GET() {
   const products = await getAllProducts();

@@ -16,14 +16,30 @@ type FormErrors = {
   form?: string;
 };
 
-export default function ProductForm() {
+type EditableProduct = {
+  id: string;
+  name: string;
+  category: CategorySlug;
+  price: number;
+  origin: string;
+  image: string;
+  description: string;
+};
+
+export default function ProductForm({
+  product,
+}: {
+  product?: EditableProduct;
+}) {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<CategorySlug | "">("");
-  const [price, setPrice] = useState("");
-  const [origin, setOrigin] = useState("");
-  const [image, setImage] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState(product?.name ?? "");
+  const [category, setCategory] = useState<CategorySlug | "">(
+    product?.category ?? "",
+  );
+  const [price, setPrice] = useState(product ? String(product.price) : "");
+  const [origin, setOrigin] = useState(product?.origin ?? "");
+  const [image, setImage] = useState(product?.image ?? "");
+  const [description, setDescription] = useState(product?.description ?? "");
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -70,18 +86,21 @@ export default function ProductForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          category,
-          price: Number(price),
-          origin,
-          image,
-          description,
-        }),
-      });
+      const response = await fetch(
+        product ? `/api/products/${product.id}` : "/api/products",
+        {
+          method: product ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            category,
+            price: Number(price),
+            origin,
+            image,
+            description,
+          }),
+        },
+      );
 
       const data = await response.json();
 
@@ -215,7 +234,13 @@ export default function ProductForm() {
         disabled={isSubmitting}
         className="inline-flex items-center justify-center gap-2 bg-gold px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.15em] text-ivory transition-colors duration-200 hover:bg-gold-dark disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isSubmitting ? "Adding Product..." : "Add Product"}
+        {isSubmitting
+          ? product
+            ? "Saving Changes..."
+            : "Adding Product..."
+          : product
+            ? "Save Changes"
+            : "Add Product"}
       </button>
     </form>
   );
