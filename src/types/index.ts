@@ -38,3 +38,12 @@ export interface CartItem {
   slug: string;
   quantity: number;
 }
+
+export interface Review {
+  id: string;
+  productSlug: string;
+  author: string;
+  rating: number;
+  body: string;
+  createdAt: string;
+}

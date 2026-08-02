@@ -4,6 +4,7 @@ import Image from "next/image";
 import Container from "@/components/ui/Container";
 import ProductGrid from "@/components/product/ProductGrid";
 import ProductDetailActions from "@/components/product/ProductDetailActions";
+import ProductReviews from "@/components/product/ProductReviews";
 import { PRODUCTS } from "@/data/products";
 import { CATEGORIES } from "@/data/categories";
 import { formatPrice } from "@/lib/utils";
@@ -91,14 +92,7 @@ export default async function ProductPage({
         </div>
       </div>
 
-      <section className="mt-20 border-t border-beige pt-12">
-        <h2 className="font-[family-name:var(--font-heading)] text-2xl">
-          Reviews
-        </h2>
-        <p className="mt-3 text-sm text-stone">
-          No reviews yet — be the first to share your thoughts.
-        </p>
-      </section>
+      <ProductReviews slug={product.slug} />
 
       {relatedProducts.length > 0 && (
         <section className="mt-20 border-t border-beige pt-12">
