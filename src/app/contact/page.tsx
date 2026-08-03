@@ -1,17 +1,29 @@
 import Container from "@/components/ui/Container";
+// import Hero from "@/components/contact/Hero";
+import ContactInfo from "@/components/contact/ContactInfo";
+import ContactForm from "@/components/contact/ContactForm";
+import Studio from "@/components/contact/Studio";
+import FAQ from "@/components/contact/FAQ";
+import Socials from "@/components/contact/Socials";
+// import CTA from "@/components/contact/CTA";
+
 
 export default function ContactPage() {
   return (
     <Container className="py-24 text-center">
-      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">
-        Contact
-      </p>
-      <h1 className="mt-4 font-[family-name:var(--font-heading)] text-5xl">
-        Get in Touch
-      </h1>
-      <p className="mx-auto mt-4 max-w-md text-stone">
-        This page is coming soon.
-      </p>
+      <h1>hi</h1>
+      {/* <Hero /> */}
+      <section className="bg-[#FCFAF7] py-24">
+        <div className="container mx-auto grid gap-12 px-6 lg:grid-cols-2">
+          <ContactInfo />
+          <ContactForm />
+        </div>
+      </section>
+    
+      <Studio />
+      <FAQ />
+      <Socials />
+      {/* <CTA /> */}
     </Container>
   );
 }
