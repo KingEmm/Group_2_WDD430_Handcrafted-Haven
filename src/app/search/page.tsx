@@ -1,6 +1,7 @@
 import Container from "@/components/ui/Container";
 import SearchBar from "@/components/layout/SearchBar";
 import ProductGrid from "@/components/product/ProductGrid";
+import EmptyState from "@/components/ui/EmptyState";
 import { getAllProducts } from "@/lib/products";
 import { searchProducts } from "@/lib/filters";
 
@@ -43,15 +44,10 @@ export default async function SearchPage({
             {results.length > 0 ? (
               <ProductGrid products={results} />
             ) : (
-              <div className="border border-beige py-24 text-center">
-                <p className="font-[family-name:var(--font-heading)] text-2xl text-espresso">
-                  No matches
-                </p>
-                <p className="mx-auto mt-3 max-w-sm text-sm text-stone">
-                  We couldn&apos;t find anything for &ldquo;{query}&rdquo;. Try a
-                  different word, or browse the full collection.
-                </p>
-              </div>
+              <EmptyState title="No matches">
+                We couldn&apos;t find anything for &ldquo;{query}&rdquo;. Try a
+                different word, or browse the full collection.
+              </EmptyState>
             )}
           </div>
         </div>
