@@ -1,4 +1,3 @@
-import Container from "@/components/ui/Container";
 import Hero from "@/components/about/AboutHero";
 import Values from "@/components/about/Values";
 import Story from "@/components/about/story";
@@ -8,17 +7,13 @@ import CTA from "@/components/about/CTA";
 
 export default function AboutPage() {
   return (
-    <Container className="py-6 text-center">
+    <>
       <Hero />
       <Values />
       <Story />
       <Impact />
       <MadeWithHeart />
       <CTA />
-    </Container>
+    </>
   );
 }
-
-//     </Container>
-//   );
-// }

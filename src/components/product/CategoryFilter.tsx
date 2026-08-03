@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/data/categories";
+import { collectionHref } from "@/lib/filters";
 import type { CategorySlug } from "@/types";
 
 const filters: { slug: CategorySlug | null; label: string }[] = [
@@ -9,8 +10,10 @@ const filters: { slug: CategorySlug | null; label: string }[] = [
 
 export default function CategoryFilter({
   active,
+  price = null,
 }: {
   active: CategorySlug | null;
+  price?: string | null;
 }) {
   return (
     <nav aria-label="Filter by category">
@@ -20,7 +23,7 @@ export default function CategoryFilter({
           return (
             <li key={slug ?? "all"}>
               <Link
-                href={slug ? `/collection?category=${slug}` : "/collection"}
+                href={collectionHref({ category: slug, price })}
                 aria-current={isActive ? "page" : undefined}
                 className={`border-b pb-1 text-xs font-semibold uppercase tracking-[0.15em] transition-colors ${
                   isActive

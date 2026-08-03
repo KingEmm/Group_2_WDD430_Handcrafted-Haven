@@ -7,37 +7,45 @@ const categories = [
     title: "Pottery",
     description: "Hand-thrown ceramics crafted with timeless techniques.",
     image: "/images/products/ceramics.jpg",
-    href: `/shop?category=pottery`,
+    // Maps to the real "ceramics" category.
+    href: "/collection?category=ceramics",
   },
   {
     title: "Woodwork",
     description: "Beautiful furniture and décor carved from premium hardwood.",
     image: "/images/products/furniture.jpg",
-    href: "/shop?category=woodwork",
+    // Maps to the real "furniture" category.
+    href: "/collection?category=furniture",
   },
   {
     title: "Textiles",
     description: "Handwoven fabrics made from natural sustainable fibers.",
     image: "/images/products/textiles.jpg",
-    href: "/shop?category=textiles",
+    href: "/collection?category=textiles",
   },
   {
     title: "Jewelry",
     description: "Elegant handcrafted jewelry made with exceptional attention to detail.",
     image: "/images/craftsmanship/artisans/jewelry.jpg",
-    href: "/shop?category=jewelry",
+    // No dedicated jewelry category in the catalog — link to the full
+    // collection rather than a mismatched filter.
+    href: "/collection",
   },
   {
     title: "Leather",
     description: "Premium leather goods that age beautifully over time.",
     image: "/images/products/accessories.jpg",
-    href: "/shop?category=leather",
+    // No dedicated leather category in the catalog — link to the full
+    // collection rather than a mismatched filter.
+    href: "/collection",
   },
   {
     title: "Painting",
     description: "Original artwork inspired by culture, heritage, and nature.",
     image: "/images/craftsmanship/categories/painting.jpg",
-    href: "/shop?category=painting",
+    // No painting/art category in the catalog — link to the full
+    // collection rather than a mismatched filter.
+    href: "/collection",
   },
 ];
 

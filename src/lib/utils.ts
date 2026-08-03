@@ -8,3 +8,20 @@ const priceFormatter = new Intl.NumberFormat("en-US", {
 export function formatPrice(amount: number): string {
   return priceFormatter.format(amount);
 }
+
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export function isValidImageUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}

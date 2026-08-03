@@ -2,10 +2,15 @@ import Link from "next/link";
 import Logo from "./Logo";
 import Navbar from "./Navbar";
 import MobileMenu from "./MobileMenu";
+import AccountMenu from "./AccountMenu";
+import CartBadge from "./CartBadge";
 import Container from "@/components/ui/Container";
-import { SearchIcon, UserIcon, CartIcon } from "@/components/ui/icons";
+import { SearchIcon, CartIcon } from "@/components/ui/icons";
+import { getSession } from "@/lib/session";
 
-export default function Header() {
+export default async function Header() {
+  const session = await getSession();
+
   return (
     <header className="sticky top-0 z-30 bg-charcoal text-ivory">
       <Container className="flex h-20 items-center justify-between gap-6">
@@ -20,22 +25,14 @@ export default function Header() {
           >
             <SearchIcon className="h-5 w-5" />
           </Link>
-          <Link
-            href="/account"
-            aria-label="Account"
-            className="hidden transition-colors hover:text-gold sm:block"
-          >
-            <UserIcon className="h-5 w-5" />
-          </Link>
+          <AccountMenu isLoggedIn={Boolean(session)} userName={session?.name} />
           <Link
             href="/cart"
             aria-label="Cart"
             className="relative hidden transition-colors hover:text-gold sm:block"
           >
             <CartIcon className="h-5 w-5" />
-            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] font-semibold text-ivory">
-              0
-            </span>
+            <CartBadge />
           </Link>
           <MobileMenu />
         </div>

@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Input from "@/components/ui/Input";
 
 type FormErrors = {
   email?: string;
   password?: string;
+  form?: string;
 };
 
 export default function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
@@ -33,7 +36,7 @@ export default function LoginForm() {
     return nextErrors;
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
@@ -42,10 +45,29 @@ export default function LoginForm() {
       return;
     }
 
-    // TODO: wire up to real authentication once the backend is in place.
     setIsSubmitting(true);
-    console.log("Login submitted", { email });
-    setTimeout(() => setIsSubmitting(false), 800);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrors({ form: data.error ?? "Invalid credentials." });
+        setIsSubmitting(false);
+        return;
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setErrors({ form: "Something went wrong. Please try again." });
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -75,6 +97,12 @@ export default function LoginForm() {
         error={errors.password}
         placeholder="Enter your password"
       />
+
+      {errors.form && (
+        <p className="text-sm text-red-500" role="alert">
+          {errors.form}
+        </p>
+      )}
 
       <div className="flex items-center justify-between text-xs">
         <label className="flex items-center gap-2 text-stone">
