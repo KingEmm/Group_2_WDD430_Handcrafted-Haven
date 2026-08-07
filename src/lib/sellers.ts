@@ -1,4 +1,5 @@
 import sql from "@/lib/db";
+import { isUuid } from "@/lib/utils";
 import type { Product } from "@/types";
 
 type SellerProductRow = {
@@ -27,7 +28,9 @@ export type SellerListing = {
   productCount: number;
 };
 
-export async function getSellersWithProducts(): Promise<SellerListing[]> {
+export async function getSellersWithProducts(
+  limit?: number,
+): Promise<SellerListing[]> {
   const rows = await sql<
     { id: string; name: string; created_at: Date; product_count: number }[]
   >`
@@ -37,6 +40,7 @@ export async function getSellersWithProducts(): Promise<SellerListing[]> {
     WHERE u.role = 'seller'
     GROUP BY u.id, u.name, u.created_at
     ORDER BY u.created_at ASC
+    ${limit ? sql`LIMIT ${limit}` : sql``}
   `;
 
   return rows.map((row) => ({
@@ -54,28 +58,28 @@ export type SellerProfile = {
   products: Product[];
 };
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 export async function getSellerProfile(
   id: string,
 ): Promise<SellerProfile | null> {
   // Route params are arbitrary strings — querying a non-UUID id would
   // otherwise throw a Postgres error instead of a clean 404.
-  if (!UUID_PATTERN.test(id)) return null;
+  if (!isUuid(id)) return null;
 
-  const [seller] = await sql<{ id: string; name: string; created_at: Date }[]>`
-    SELECT id, name, created_at FROM users WHERE id = ${id} AND role = 'seller'
-  `;
+  // Both queries key only on ${id}, so run them in parallel.
+  const [sellerRows, rows] = await Promise.all([
+    sql<{ id: string; name: string; created_at: Date }[]>`
+      SELECT id, name, created_at FROM users WHERE id = ${id} AND role = 'seller'
+    `,
+    sql<SellerProductRow[]>`
+      SELECT slug, name, category, price, origin, image, description, featured
+      FROM products
+      WHERE seller_id = ${id}
+      ORDER BY created_at DESC
+    `,
+  ]);
 
+  const seller = sellerRows[0];
   if (!seller) return null;
-
-  const rows = await sql<SellerProductRow[]>`
-    SELECT slug, name, category, price, origin, image, description, featured
-    FROM products
-    WHERE seller_id = ${id}
-    ORDER BY created_at DESC
-  `;
 
   return {
     id: seller.id,
