@@ -40,7 +40,6 @@ export default function ReviewForm({ productSlug }: { productSlug: string }) {
 
       if (!response.ok) {
         setError(data.error ?? "Something went wrong.");
-        setIsSubmitting(false);
         return;
       }
 
@@ -48,10 +47,10 @@ export default function ReviewForm({ productSlug }: { productSlug: string }) {
       setRating(0);
       setHover(0);
       setSuccess(true);
-      setIsSubmitting(false);
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
+    } finally {
       setIsSubmitting(false);
     }
   }

@@ -1,4 +1,18 @@
-import type { Product } from "@/types";
+import { CATEGORIES } from "@/data/categories";
+import type { CategorySlug, Product } from "@/types";
+
+const VALID_CATEGORIES = new Set(CATEGORIES.map((c) => c.slug));
+
+// Validate a raw ?category= slug against the known set (sibling to parsePriceBand).
+export function parseCategory(value?: string): CategorySlug | null {
+  return value && VALID_CATEGORIES.has(value as CategorySlug)
+    ? (value as CategorySlug)
+    : null;
+}
+
+export function categoryName(slug: CategorySlug | null): string | null {
+  return slug ? (CATEGORIES.find((c) => c.slug === slug)?.name ?? null) : null;
+}
 
 export const PRICE_BANDS = [
   { slug: "under-75", label: "Under $75", min: 0, max: 75 },

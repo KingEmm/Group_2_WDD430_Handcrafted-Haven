@@ -4,18 +4,15 @@ import CategoryFilter from "@/components/product/CategoryFilter";
 import PriceFilter from "@/components/product/PriceFilter";
 import ProductGrid from "@/components/product/ProductGrid";
 import { getAllProducts } from "@/lib/products";
-import { CATEGORIES } from "@/data/categories";
-import { collectionHref, matchesPriceBand, parsePriceBand } from "@/lib/filters";
-import type { CategorySlug } from "@/types";
+import {
+  categoryName,
+  collectionHref,
+  matchesPriceBand,
+  parseCategory,
+  parsePriceBand,
+} from "@/lib/filters";
 
-const VALID_CATEGORIES = new Set(CATEGORIES.map((c) => c.slug));
 const PAGE_SIZE = 12;
-
-function parseCategory(value?: string): CategorySlug | null {
-  return value && VALID_CATEGORIES.has(value as CategorySlug)
-    ? (value as CategorySlug)
-    : null;
-}
 
 export default async function CollectionPage({
   searchParams,
@@ -25,6 +22,7 @@ export default async function CollectionPage({
   const { category, price, page } = await searchParams;
   const active = parseCategory(category);
   const priceBand = parsePriceBand(price);
+  const activePrice = priceBand?.slug ?? null;
 
   const allProducts = await getAllProducts();
   const products = allProducts.filter((product) => {
@@ -44,16 +42,10 @@ export default async function CollectionPage({
   );
 
   function pageHref(targetPage: number): string {
-    return collectionHref({
-      category: active,
-      price: priceBand?.slug ?? null,
-      page: targetPage,
-    });
+    return collectionHref({ category: active, price: activePrice, page: targetPage });
   }
 
-  const activeName = active
-    ? CATEGORIES.find((c) => c.slug === active)?.name
-    : null;
+  const activeName = categoryName(active);
 
   return (
     <Container className="py-16 lg:py-24">
@@ -72,12 +64,12 @@ export default async function CollectionPage({
 
       <div className="mt-12 flex flex-col gap-5 border-b border-beige pb-6">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <CategoryFilter active={active} price={priceBand?.slug ?? null} />
+          <CategoryFilter active={active} price={activePrice} />
           <p className="text-xs uppercase tracking-[0.15em] text-stone">
             {products.length} {products.length === 1 ? "piece" : "pieces"}
           </p>
         </div>
-        <PriceFilter active={priceBand?.slug ?? null} category={active} />
+        <PriceFilter active={activePrice} category={active} />
       </div>
 
       <div className="mt-12">

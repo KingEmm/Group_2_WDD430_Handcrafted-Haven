@@ -1,18 +1,14 @@
 import type { Product } from "@/types";
 import ProductCard from "./ProductCard";
+import EmptyState from "@/components/ui/EmptyState";
 
 export default function ProductGrid({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
-      <div className="border border-beige py-24 text-center">
-        <p className="font-[family-name:var(--font-heading)] text-2xl text-espresso">
-          Nothing here yet
-        </p>
-        <p className="mx-auto mt-3 max-w-sm text-sm text-stone">
-          No pieces match this category right now. Explore the full collection
-          to see everything our makers have crafted.
-        </p>
-      </div>
+      <EmptyState title="Nothing here yet">
+        No pieces match this category right now. Explore the full collection to
+        see everything our makers have crafted.
+      </EmptyState>
     );
   }
 
