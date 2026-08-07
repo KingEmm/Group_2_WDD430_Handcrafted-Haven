@@ -7,15 +7,8 @@ export async function POST(request: NextRequest) {
     const { name, email, address, city, state, postalCode, country, items } =
       await request.json();
 
-    if (
-      !name ||
-      !email ||
-      !address ||
-      !city ||
-      !state ||
-      !postalCode ||
-      !country
-    ) {
+    const shipping = { name, email, address, city, state, postalCode, country };
+    if (Object.values(shipping).some((field) => !field)) {
       return NextResponse.json(
         { error: "All shipping fields are required." },
         { status: 400 },
@@ -48,7 +41,7 @@ export async function POST(request: NextRequest) {
     const session = await getSession();
 
     const orderId = await createOrder(
-      { name, email, address, city, state, postalCode, country },
+      shipping,
       items,
       session?.userId ?? null,
     );

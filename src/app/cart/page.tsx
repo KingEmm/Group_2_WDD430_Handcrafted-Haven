@@ -1,21 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
+import ProductImage from "@/components/product/ProductImage";
 import { useCart } from "@/context/CartContext";
-import type { CartItem, Product } from "@/types";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, resolveCartLines } from "@/lib/utils";
 
 export default function CartPage() {
   const { items, subtotal, products, removeItem, setQuantity } = useCart();
 
-  const lines = items
-    .map((item) => {
-      const product = products.find((p) => p.slug === item.slug);
-      return product ? { item, product } : null;
-    })
-    .filter((line): line is { item: CartItem; product: Product } => line !== null);
+  const lines = resolveCartLines(items, products);
 
   if (lines.length === 0) {
     return (
@@ -53,22 +47,11 @@ export default function CartPage() {
               className="flex gap-5 py-6 sm:gap-8"
             >
               <div className="relative h-28 w-24 flex-shrink-0 overflow-hidden bg-beige/40 sm:h-32 sm:w-28">
-                {product.source === "db" ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- seller-submitted image host isn't in next/image's remotePatterns allowlist
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="112px"
-                    className="object-cover"
-                  />
-                )}
+                <ProductImage
+                  product={product}
+                  sizes="112px"
+                  className="object-cover"
+                />
               </div>
 
               <div className="flex flex-1 flex-col justify-between">

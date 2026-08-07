@@ -2,11 +2,7 @@ import { notFound } from "next/navigation";
 import Container from "@/components/ui/Container";
 import ProductGrid from "@/components/product/ProductGrid";
 import { getSellerProfile } from "@/lib/sellers";
-
-const MEMBER_SINCE_FORMATTER = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "long",
-});
+import { formatMonthYear } from "@/lib/utils";
 
 export default async function ArtisanProfilePage({
   params,
@@ -30,7 +26,7 @@ export default async function ArtisanProfilePage({
           {seller.name}
         </h1>
         <p className="mt-5 text-base leading-relaxed text-stone">
-          Member since {MEMBER_SINCE_FORMATTER.format(seller.memberSince)} ·{" "}
+          Member since {formatMonthYear(seller.memberSince)} ·{" "}
           {seller.products.length}{" "}
           {seller.products.length === 1 ? "piece" : "pieces"} listed
         </p>

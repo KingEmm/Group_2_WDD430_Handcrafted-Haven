@@ -1,16 +1,11 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import { ArrowRightIcon } from "@/components/ui/icons";
 import { getSellersWithProducts } from "@/lib/sellers";
-
-const MEMBER_SINCE_FORMATTER = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "long",
-});
+import { formatMonthYear } from "@/lib/utils";
 
 export default async function MeetArtisans() {
-  const sellers = await getSellersWithProducts();
-  const featured = sellers.slice(0, 4);
+  const featured = await getSellersWithProducts(4);
 
   return (
     <section className="bg-[#FCFAF7] py-24">
@@ -49,10 +44,7 @@ export default async function MeetArtisans() {
             >
               View All Artisans
 
-              <ArrowRight
-                size={18}
-                className="transition group-hover:translate-x-1"
-              />
+              <ArrowRightIcon className="h-[18px] w-[18px] transition group-hover:translate-x-1" />
             </Link>
 
           </div>
@@ -93,7 +85,7 @@ export default async function MeetArtisans() {
                     </p>
 
                     <p className="mt-3 text-sm text-[#766B63]">
-                      Member since {MEMBER_SINCE_FORMATTER.format(seller.memberSince)}
+                      Member since {formatMonthYear(seller.memberSince)}
                     </p>
 
                     <Link
@@ -102,10 +94,7 @@ export default async function MeetArtisans() {
                     >
                       View Storefront
 
-                      <ArrowRight
-                        size={16}
-                        className="transition group-hover:translate-x-1"
-                      />
+                      <ArrowRightIcon className="h-4 w-4 transition group-hover:translate-x-1" />
                     </Link>
 
                   </div>

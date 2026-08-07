@@ -1,5 +1,6 @@
 import sql from "@/lib/db";
 import { getProductBySlug } from "@/lib/products";
+import { isUuid } from "@/lib/utils";
 
 export type CheckoutItem = {
   slug: string;
@@ -170,25 +171,27 @@ export async function getSellerSales(
 }
 
 export async function getOrderById(id: string): Promise<OrderSummary | null> {
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
-    return null;
-  }
+  // Route params are arbitrary strings — a non-UUID id would otherwise throw a
+  // Postgres error instead of a clean 404.
+  if (!isUuid(id)) return null;
 
-  const [order] = await sql`
-    SELECT id, order_number, customer_name, customer_email, shipping_address,
-           shipping_city, shipping_state, shipping_postal_code, shipping_country,
-           subtotal, created_at
-    FROM orders
-    WHERE id = ${id}
-  `;
+  // The two queries both key only on ${id}, so fetch them in parallel.
+  const [[order], items] = await Promise.all([
+    sql`
+      SELECT id, order_number, customer_name, customer_email, shipping_address,
+             shipping_city, shipping_state, shipping_postal_code, shipping_country,
+             subtotal, created_at
+      FROM orders
+      WHERE id = ${id}
+    `,
+    sql`
+      SELECT product_slug AS slug, product_name AS name, unit_price, quantity, image
+      FROM order_items
+      WHERE order_id = ${id}
+    `,
+  ]);
 
   if (!order) return null;
-
-  const items = await sql`
-    SELECT product_slug AS slug, product_name AS name, unit_price, quantity, image
-    FROM order_items
-    WHERE order_id = ${id}
-  `;
 
   return {
     id: order.id,

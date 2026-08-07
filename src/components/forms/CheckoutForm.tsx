@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Input from "@/components/ui/Input";
 import { useCart } from "@/context/CartContext";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, resolveCartLines } from "@/lib/utils";
 
 type FormErrors = {
   name?: string;
@@ -37,12 +37,7 @@ export default function CheckoutForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const lines = items
-    .map((item) => {
-      const product = products.find((p) => p.slug === item.slug);
-      return product ? { item, product } : null;
-    })
-    .filter((line): line is { item: typeof items[number]; product: (typeof products)[number] } => line !== null);
+  const lines = resolveCartLines(items, products);
 
   function validate(): FormErrors {
     const nextErrors: FormErrors = {};

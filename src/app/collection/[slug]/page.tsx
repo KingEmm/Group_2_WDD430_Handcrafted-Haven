@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import ProductImage from "@/components/product/ProductImage";
 import Container from "@/components/ui/Container";
 import ProductGrid from "@/components/product/ProductGrid";
 import ProductDetailActions from "@/components/product/ProductDetailActions";
@@ -52,23 +52,12 @@ export default async function ProductPage({
 
       <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
         <div className="relative aspect-[4/5] w-full overflow-hidden bg-beige/40">
-          {product.source === "db" ? (
-            // eslint-disable-next-line @next/next/no-img-element -- seller-submitted image host isn't in next/image's remotePatterns allowlist
-            <img
-              src={product.image}
-              alt={product.name}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-              priority
-            />
-          )}
+          <ProductImage
+            product={product}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-cover"
+            priority
+          />
         </div>
 
         <div>
