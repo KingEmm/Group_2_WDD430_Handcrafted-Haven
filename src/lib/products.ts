@@ -22,16 +22,26 @@ type ProductRow = {
   seller_id: string;
 };
 
+const STATIC_BY_SLUG = new Map(PRODUCTS.map((p) => [p.slug, p]));
+
+// Shared column list + join for a DB-backed product row, composed into each
+// query below so the row shape is defined once. Callers append WHERE/ORDER BY.
+function productSelect() {
+  return sql`
+    SELECT p.slug, p.name, p.category, p.price, p.origin, p.image,
+           p.description, p.featured, p.seller_id, u.name AS artisan
+    FROM products p
+    JOIN users u ON u.id = p.seller_id
+  `;
+}
+
 function dbRowToProduct({ seller_id, ...row }: ProductRow): Product {
   return { ...row, source: "db", sellerId: seller_id };
 }
 
 export async function getAllProducts(): Promise<Product[]> {
   const rows = await sql<ProductRow[]>`
-    SELECT p.slug, p.name, p.category, p.price, p.origin, p.image,
-           p.description, p.featured, p.seller_id, u.name AS artisan
-    FROM products p
-    JOIN users u ON u.id = p.seller_id
+    ${productSelect()}
     ORDER BY p.created_at DESC
   `;
 
@@ -43,22 +53,18 @@ export async function getAllProducts(): Promise<Product[]> {
 export async function getProductsBySlugs(
   slugs: string[],
 ): Promise<Map<string, Product>> {
-  const staticBySlug = new Map(PRODUCTS.map((p) => [p.slug, p]));
   const result = new Map<string, Product>();
   const dbSlugs: string[] = [];
 
   for (const slug of slugs) {
-    const staticMatch = staticBySlug.get(slug);
+    const staticMatch = STATIC_BY_SLUG.get(slug);
     if (staticMatch) result.set(slug, staticMatch);
     else dbSlugs.push(slug);
   }
 
   if (dbSlugs.length > 0) {
     const rows = await sql<ProductRow[]>`
-      SELECT p.slug, p.name, p.category, p.price, p.origin, p.image,
-             p.description, p.featured, p.seller_id, u.name AS artisan
-      FROM products p
-      JOIN users u ON u.id = p.seller_id
+      ${productSelect()}
       WHERE p.slug = ANY(${dbSlugs})
     `;
     for (const row of rows) result.set(row.slug, dbRowToProduct(row));
@@ -70,16 +76,5 @@ export async function getProductsBySlugs(
 export async function getProductBySlug(
   slug: string,
 ): Promise<Product | undefined> {
-  const staticMatch = PRODUCTS.find((p) => p.slug === slug);
-  if (staticMatch) return staticMatch;
-
-  const rows = await sql<ProductRow[]>`
-    SELECT p.slug, p.name, p.category, p.price, p.origin, p.image,
-           p.description, p.featured, p.seller_id, u.name AS artisan
-    FROM products p
-    JOIN users u ON u.id = p.seller_id
-    WHERE p.slug = ${slug}
-  `;
-
-  return rows[0] ? dbRowToProduct(rows[0]) : undefined;
+  return (await getProductsBySlugs([slug])).get(slug);
 }
