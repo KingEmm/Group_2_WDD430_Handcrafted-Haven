@@ -27,6 +27,9 @@ export function isUuid(value: string): boolean {
   return UUID_PATTERN.test(value);
 }
 
+// Shared by the checkout form (client) and the orders API (server).
+export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export type CartLine = { item: CartItem; product: Product };
 
 // Join cart items to their catalog product (O(1) lookups), dropping any whose

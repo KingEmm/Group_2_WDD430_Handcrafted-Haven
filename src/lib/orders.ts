@@ -1,5 +1,5 @@
 import sql from "@/lib/db";
-import { getProductBySlug } from "@/lib/products";
+import { getProductsBySlugs } from "@/lib/products";
 import { isUuid } from "@/lib/utils";
 
 export type CheckoutItem = {
@@ -49,19 +49,21 @@ export async function createOrder(
     throw new OrderError("Your cart is empty.");
   }
 
-  // Never trust client-supplied prices — resolve each item against the
-  // real catalog (static + DB) so the charged total can't be manipulated.
-  const resolvedItems = await Promise.all(
-    items.map(async (item) => {
-      const product = await getProductBySlug(item.slug);
-      if (!product) {
-        throw new OrderError(
-          `One of the items in your cart is no longer available.`,
-        );
-      }
-      return { product, quantity: item.quantity };
-    }),
+  // Never trust client-supplied prices — resolve each item against the real
+  // catalog (static + DB) in a single lookup so the charged total can't be
+  // manipulated.
+  const productsBySlug = await getProductsBySlugs(
+    items.map((item) => item.slug),
   );
+  const resolvedItems = items.map((item) => {
+    const product = productsBySlug.get(item.slug);
+    if (!product) {
+      throw new OrderError(
+        "One of the items in your cart is no longer available.",
+      );
+    }
+    return { product, quantity: item.quantity };
+  });
 
   const subtotal = resolvedItems.reduce(
     (sum, { product, quantity }) => sum + product.price * quantity,
@@ -83,12 +85,24 @@ export async function createOrder(
       RETURNING id
     `;
 
-    for (const { product, quantity } of resolvedItems) {
-      await tx`
-        INSERT INTO order_items (order_id, product_slug, product_name, unit_price, quantity, image)
-        VALUES (${order.id}, ${product.slug}, ${product.name}, ${product.price}, ${quantity}, ${product.image})
-      `;
-    }
+    await tx`
+      INSERT INTO order_items ${tx(
+        resolvedItems.map(({ product, quantity }) => ({
+          order_id: order.id,
+          product_slug: product.slug,
+          product_name: product.name,
+          unit_price: product.price,
+          quantity,
+          image: product.image,
+        })),
+        "order_id",
+        "product_slug",
+        "product_name",
+        "unit_price",
+        "quantity",
+        "image",
+      )}
+    `;
 
     return order.id;
   });

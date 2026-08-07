@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { createOrder, OrderError } from "@/lib/orders";
+import { EMAIL_PATTERN } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!EMAIL_PATTERN.test(email)) {
       return NextResponse.json(
         { error: "Enter a valid email address." },
         { status: 400 },

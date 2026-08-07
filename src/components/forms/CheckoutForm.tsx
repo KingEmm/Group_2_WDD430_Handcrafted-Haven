@@ -1,67 +1,77 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Input from "@/components/ui/Input";
 import { useCart } from "@/context/CartContext";
-import { formatPrice, resolveCartLines } from "@/lib/utils";
+import { EMAIL_PATTERN, formatPrice, resolveCartLines } from "@/lib/utils";
 
-type FormErrors = {
-  name?: string;
-  email?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
-  cardNumber?: string;
-  expiry?: string;
-  cvv?: string;
-  form?: string;
+type FormFields =
+  | "name"
+  | "email"
+  | "address"
+  | "city"
+  | "state"
+  | "postalCode"
+  | "country"
+  | "cardNumber"
+  | "expiry"
+  | "cvv";
+
+type FormErrors = Partial<Record<FormFields, string>> & { form?: string };
+
+const EMPTY_FORM: Record<FormFields, string> = {
+  name: "",
+  email: "",
+  address: "",
+  city: "",
+  state: "",
+  postalCode: "",
+  country: "",
+  cardNumber: "",
+  expiry: "",
+  cvv: "",
 };
 
 export default function CheckoutForm() {
   const router = useRouter();
   const { items, subtotal, products, clearCart } = useCart();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [country, setCountry] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
+  const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const lines = resolveCartLines(items, products);
 
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
+    const { id, value } = event.target;
+    setForm((prev) => ({ ...prev, [id]: value }));
+  }
+
   function validate(): FormErrors {
     const nextErrors: FormErrors = {};
 
-    if (!name.trim()) nextErrors.name = "Name is required.";
-    if (!email) {
+    if (!form.name.trim()) nextErrors.name = "Name is required.";
+    if (!form.email) {
       nextErrors.email = "Email is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    } else if (!EMAIL_PATTERN.test(form.email)) {
       nextErrors.email = "Enter a valid email address.";
     }
-    if (!address.trim()) nextErrors.address = "Address is required.";
-    if (!city.trim()) nextErrors.city = "City is required.";
-    if (!state.trim()) nextErrors.state = "State is required.";
-    if (!postalCode.trim()) nextErrors.postalCode = "Postal code is required.";
-    if (!country.trim()) nextErrors.country = "Country is required.";
+    if (!form.address.trim()) nextErrors.address = "Address is required.";
+    if (!form.city.trim()) nextErrors.city = "City is required.";
+    if (!form.state.trim()) nextErrors.state = "State is required.";
+    if (!form.postalCode.trim())
+      nextErrors.postalCode = "Postal code is required.";
+    if (!form.country.trim()) nextErrors.country = "Country is required.";
 
     // Cosmetic only — never sent to the server.
-    if (!/^\d{13,19}$/.test(cardNumber.replace(/\s/g, ""))) {
+    if (!/^\d{13,19}$/.test(form.cardNumber.replace(/\s/g, ""))) {
       nextErrors.cardNumber = "Enter a valid card number.";
     }
-    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+    if (!/^\d{2}\/\d{2}$/.test(form.expiry)) {
       nextErrors.expiry = "Use MM/YY format.";
     }
-    if (!/^\d{3,4}$/.test(cvv)) {
+    if (!/^\d{3,4}$/.test(form.cvv)) {
       nextErrors.cvv = "Enter a valid CVV.";
     }
 
@@ -83,14 +93,15 @@ export default function CheckoutForm() {
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // Card fields are cosmetic — send only the shipping details.
         body: JSON.stringify({
-          name,
-          email,
-          address,
-          city,
-          state,
-          postalCode,
-          country,
+          name: form.name,
+          email: form.email,
+          address: form.address,
+          city: form.city,
+          state: form.state,
+          postalCode: form.postalCode,
+          country: form.country,
           items: items.map((item) => ({
             slug: item.slug,
             quantity: item.quantity,
@@ -128,8 +139,8 @@ export default function CheckoutForm() {
                 id="name"
                 type="text"
                 autoComplete="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={form.name}
+                onChange={handleChange}
                 error={errors.name}
                 placeholder="Jane Doe"
               />
@@ -140,8 +151,8 @@ export default function CheckoutForm() {
                 id="email"
                 type="email"
                 autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={form.email}
+                onChange={handleChange}
                 error={errors.email}
                 placeholder="you@example.com"
               />
@@ -152,8 +163,8 @@ export default function CheckoutForm() {
                 id="address"
                 type="text"
                 autoComplete="street-address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={form.address}
+                onChange={handleChange}
                 error={errors.address}
                 placeholder="123 Maple Street"
               />
@@ -163,8 +174,8 @@ export default function CheckoutForm() {
               id="city"
               type="text"
               autoComplete="address-level2"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
+              value={form.city}
+              onChange={handleChange}
               error={errors.city}
               placeholder="Rexburg"
             />
@@ -173,8 +184,8 @@ export default function CheckoutForm() {
               id="state"
               type="text"
               autoComplete="address-level1"
-              value={state}
-              onChange={(e) => setState(e.target.value)}
+              value={form.state}
+              onChange={handleChange}
               error={errors.state}
               placeholder="ID"
             />
@@ -183,8 +194,8 @@ export default function CheckoutForm() {
               id="postalCode"
               type="text"
               autoComplete="postal-code"
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
+              value={form.postalCode}
+              onChange={handleChange}
               error={errors.postalCode}
               placeholder="83440"
             />
@@ -193,8 +204,8 @@ export default function CheckoutForm() {
               id="country"
               type="text"
               autoComplete="country-name"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
+              value={form.country}
+              onChange={handleChange}
               error={errors.country}
               placeholder="United States"
             />
@@ -216,8 +227,8 @@ export default function CheckoutForm() {
                 type="text"
                 inputMode="numeric"
                 autoComplete="cc-number"
-                value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
+                value={form.cardNumber}
+                onChange={handleChange}
                 error={errors.cardNumber}
                 placeholder="4242 4242 4242 4242"
               />
@@ -227,8 +238,8 @@ export default function CheckoutForm() {
               id="expiry"
               type="text"
               autoComplete="cc-exp"
-              value={expiry}
-              onChange={(e) => setExpiry(e.target.value)}
+              value={form.expiry}
+              onChange={handleChange}
               error={errors.expiry}
               placeholder="12/28"
             />
@@ -238,8 +249,8 @@ export default function CheckoutForm() {
               type="text"
               inputMode="numeric"
               autoComplete="cc-csc"
-              value={cvv}
-              onChange={(e) => setCvv(e.target.value)}
+              value={form.cvv}
+              onChange={handleChange}
               error={errors.cvv}
               placeholder="123"
             />
