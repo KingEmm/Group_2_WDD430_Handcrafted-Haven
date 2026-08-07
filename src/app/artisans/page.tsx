@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Container from "@/components/ui/Container";
+import EmptyState from "@/components/ui/EmptyState";
 import { getSellersWithProducts } from "@/lib/sellers";
 
 export default async function ArtisansPage() {
@@ -20,14 +21,9 @@ export default async function ArtisansPage() {
       </header>
 
       {sellers.length === 0 ? (
-        <div className="mt-12 border border-beige py-24 text-center">
-          <p className="font-[family-name:var(--font-heading)] text-2xl text-espresso">
-            No artisans have listed anything yet
-          </p>
-          <p className="mx-auto mt-3 max-w-sm text-sm text-stone">
-            Check back soon as sellers add their first pieces.
-          </p>
-        </div>
+        <EmptyState title="No artisans have listed anything yet" className="mt-12">
+          Check back soon as sellers add their first pieces.
+        </EmptyState>
       ) : (
         <ul className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {sellers.map((seller) => (

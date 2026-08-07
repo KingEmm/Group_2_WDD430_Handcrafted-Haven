@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
+import EmptyState from "@/components/ui/EmptyState";
 import DeleteProductButton from "@/components/dashboard/DeleteProductButton";
 import sql from "@/lib/db";
 import { getSession } from "@/lib/session";
@@ -33,14 +34,9 @@ export default async function DashboardProductsPage() {
       </div>
 
       {products.length === 0 ? (
-        <div className="mt-12 border border-beige py-24 text-center">
-          <p className="font-[family-name:var(--font-heading)] text-2xl text-espresso">
-            You haven&apos;t listed anything yet
-          </p>
-          <p className="mx-auto mt-3 max-w-sm text-sm text-stone">
-            Add your first product to start building your storefront.
-          </p>
-        </div>
+        <EmptyState title="You haven't listed anything yet" className="mt-12">
+          Add your first product to start building your storefront.
+        </EmptyState>
       ) : (
         <ul className="mt-12 divide-y divide-beige border-y border-beige">
           {products.map((product) => (

@@ -1,4 +1,5 @@
 import Container from "@/components/ui/Container";
+import EmptyState from "@/components/ui/EmptyState";
 import { getSession } from "@/lib/session";
 import { getSellerSales } from "@/lib/orders";
 import { formatPrice } from "@/lib/utils";
@@ -37,15 +38,10 @@ export default async function SellerSalesPage() {
       </div>
 
       {sales.length === 0 ? (
-        <div className="mt-12 border border-beige py-24 text-center">
-          <p className="font-[family-name:var(--font-heading)] text-2xl text-espresso">
-            No sales yet
-          </p>
-          <p className="mx-auto mt-3 max-w-sm text-sm text-stone">
-            Sold items will show up here once a customer buys one of your
-            products.
-          </p>
-        </div>
+        <EmptyState title="No sales yet" className="mt-12">
+          Sold items will show up here once a customer buys one of your
+          products.
+        </EmptyState>
       ) : (
         <ul className="mt-12 divide-y divide-beige border-y border-beige">
           {sales.map((sale, index) => (

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Container from "@/components/ui/Container";
+import EmptyState from "@/components/ui/EmptyState";
 import { getSession } from "@/lib/session";
 import { getOrdersByCustomerId } from "@/lib/orders";
 import { formatPrice } from "@/lib/utils";
@@ -30,14 +31,9 @@ export default async function OrderHistoryPage() {
       </h1>
 
       {orders.length === 0 ? (
-        <div className="mt-12 border border-beige py-24 text-center">
-          <p className="font-[family-name:var(--font-heading)] text-2xl text-espresso">
-            No orders yet
-          </p>
-          <p className="mx-auto mt-3 max-w-sm text-sm text-stone">
-            Your past orders will show up here once you make a purchase.
-          </p>
-        </div>
+        <EmptyState title="No orders yet" className="mt-12">
+          Your past orders will show up here once you make a purchase.
+        </EmptyState>
       ) : (
         <ul className="mt-12 divide-y divide-beige border-y border-beige">
           {orders.map((order) => (

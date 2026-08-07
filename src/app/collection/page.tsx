@@ -33,7 +33,7 @@ export default async function CollectionPage({
 
   const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
   const currentPage = Math.min(
-    Math.max(1, Number(page) || 1),
+    Math.max(1, Math.trunc(Number(page)) || 1),
     totalPages,
   );
   const pagedProducts = products.slice(
