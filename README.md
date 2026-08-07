@@ -51,6 +51,55 @@ We chose a premium, rustic, and elegant color scheme paired with highly readable
 
 ---
 
+## Local Development
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Environment variables
+
+The app reads two variables — `DATABASE_URL` and `AUTH_SECRET`. Copy the example file and fill it in:
+
+```bash
+cp .env.example .env.local
+```
+
+Generate an `AUTH_SECRET` with `openssl rand -hex 32`.
+
+### 3. Database
+
+Start a local Postgres and apply the schema + seed test accounts (requires Docker):
+
+```bash
+npm run db:setup
+```
+
+> If you point `DATABASE_URL` at a **new/empty** database, you must apply the schema first (the `sql/*.sql` files via `sql/setup.sh`) — otherwise pages 500 with `relation "products" does not exist`.
+
+Seeded test accounts (password `password123`): `customer@test.com`, `seller@test.com`.
+
+### 4. Run the app
+
+```bash
+npm run dev
+```
+
+### Keeping local and production databases separate
+
+`.env.local` is used everywhere, but Next.js loads **`.env.development.local` first and only during `npm run dev`** (never in production). So keep your **local** DB URL there and let production use the DB configured in the hosting platform (Vercel):
+
+```bash
+# .env.development.local  (git-ignored — each dev creates their own)
+DATABASE_URL=postgresql://haven:haven_dev@localhost:5432/handcrafted_haven
+```
+
+`npm run dev` then uses the local DB automatically, while deployments use the production `DATABASE_URL` from Vercel — no swapping and no code change (the code always reads `process.env.DATABASE_URL`).
+
+---
+
 ## Initial Backlog & User Stories
 
 Below are the 10 core user stories brainstormed and mapped out for our initial kanban planning.
