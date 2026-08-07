@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRightIcon } from "@/components/ui/icons";
 
 export default function CraftHero() {
   return (
@@ -48,10 +48,7 @@ export default function CraftHero() {
             >
               Explore Products
 
-              <ArrowRight
-                size={18}
-                className="transition-transform group-hover:translate-x-1"
-              />
+              <ArrowRightIcon className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
 
             <Link
